@@ -1,6 +1,6 @@
 use yew::prelude::*;
-use yew_preview::create_component_item;
 use yew_preview::prelude::*;
+use yew_preview::{create_component_item, create_preview};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct HeaderCompProps {
@@ -16,7 +16,7 @@ pub fn header_comp(props: &HeaderCompProps) -> Html {
     }
 }
 
-#[derive(Properties, PartialEq, Clone)]
+#[derive(Properties, PartialEq, Clone, Default)]
 pub struct ImageCompProps {
     pub src: String,
     pub size: u32,
@@ -28,6 +28,25 @@ pub fn image_comp(props: &ImageCompProps) -> Html {
         <img src={ props.src.clone() } width={ format!("{}px", &props.size) } height={ format!("{}px", &props.size) } style="display: block; margin: 0 auto;" />
     }
 }
+
+create_preview!(
+    ImageComp,
+    ImageCompProps::default(),
+    (
+        "256",
+        ImageCompProps {
+            size: 256,
+            src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+        }
+    ),
+    (
+        "512",
+        ImageCompProps {
+            size: 512,
+            src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+        }
+    )
+);
 
 #[function_component(App)]
 pub fn app() -> Html {
@@ -50,26 +69,7 @@ pub fn app() -> Html {
                 )
             ]
         ),
-        create_component_item!(
-            "Image",
-            ImageComp,
-            vec![
-                (
-                    "256".to_string(),
-                    ImageCompProps {
-                        size: 256,
-                        src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
-                    }
-                ),
-                (
-                    "512".to_string(),
-                    ImageCompProps {
-                        size: 512,
-                        src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
-                    }
-                )
-            ]
-        ),
+        ImageComp::preview(),
     ];
 
     html! {

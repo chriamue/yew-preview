@@ -144,6 +144,25 @@ Ensure you have the following installed:
    }
    ```
 
+You can also create a preview with macro `create_preview!`:
+
+   ```rust
+   create_preview!(
+       ImageComp,
+       ImageCompProps::default(),
+       ("256",
+       ImageCompProps {
+           size: 256,
+           src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+       }),
+       ("512",
+       ImageCompProps {
+           size: 512,
+           src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+       })
+   );
+   ```
+
 ### Running the Application
 
 1. Build and serve the application using Trunk:

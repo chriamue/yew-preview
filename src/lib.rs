@@ -1,14 +1,21 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+mod component_preview;
+mod component_selector;
+mod preview_page;
+
+use yew::Html;
+
+#[derive(Clone, PartialEq)]
+pub struct ComponentItem {
+    pub name: String,
+    pub render: Html,
+    pub props: String,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub type ComponentList = Vec<ComponentItem>;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub mod prelude {
+    pub use crate::component_preview::ComponentPreview;
+    pub use crate::component_selector::ComponentSelector;
+    pub use crate::preview_page::PreviewPage;
+    pub use crate::{ComponentItem, ComponentList};
 }

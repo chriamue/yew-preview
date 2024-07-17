@@ -28,14 +28,8 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     html! {
         <div>
             <ComponentSelector components={components.clone()} on_select={on_component_select} />
-            <ComponentPreview item={
-                if let Some(index) = *selected_component {
-                    Some(components[index].clone())
-                } else {
-                    None
-                }
-            } />
-            <ConfigPanel properties={components.iter().flat_map(|c| c.props.clone()).collect::<Vec<_>>()}
+            <ComponentPreview item={(*selected_component).map(|index| components[index].clone())} />
+            <ConfigPanel properties={(*selected_component).map(|index| components[index].props.clone()).unwrap_or_default()}
                 on_select={on_property_select} />
         </div>
     }

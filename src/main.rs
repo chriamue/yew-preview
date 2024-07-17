@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use yew_preview::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct HeaderCompProps {
@@ -29,10 +30,22 @@ pub fn image_comp(props: &ImageCompProps) -> Html {
 
 #[function_component(App)]
 pub fn app() -> Html {
+    let components = vec![
+        ComponentItem {
+            name: "Header".to_string(),
+            render: html! { <HeaderComp title={"Hello, Yew!"} /> },
+            props: vec![],
+        },
+        ComponentItem {
+            name: "Image".to_string(),
+            render: html! { <ImageComp src={"https://www.rust-lang.org/logos/rust-logo-512x512.png"} size={256} /> },
+            props: vec![],
+        },
+    ];
+
     html! {
         <div>
-            <HeaderComp title={"Hello, Yew!"} />
-            <ImageComp src={"https://www.rust-lang.org/logos/rust-logo-512x512.png"} size={256} />
+            <PreviewPage {components} />
         </div>
     }
 }

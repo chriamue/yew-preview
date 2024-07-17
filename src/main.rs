@@ -10,7 +10,7 @@ pub struct HeaderCompProps {
 #[function_component(HeaderComp)]
 pub fn header_comp(props: &HeaderCompProps) -> Html {
     html! {
-        <header>
+        <header style="border-bottom: 1px solid #ccc; padding: 10px;">
             <h1>{ &props.title }</h1>
         </header>
     }
@@ -25,7 +25,7 @@ pub struct ImageCompProps {
 #[function_component(ImageComp)]
 pub fn image_comp(props: &ImageCompProps) -> Html {
     html! {
-        <img src={ props.src.clone() } width={ format!("{}px", &props.size) } height={ format!("{}px", &props.size) } />
+        <img src={ props.src.clone() } width={ format!("{}px", &props.size) } height={ format!("{}px", &props.size) } style="display: block; margin: 0 auto;" />
     }
 }
 
@@ -37,13 +37,13 @@ pub fn app() -> Html {
             HeaderComp,
             vec![
                 (
-                    "Hello",
+                    "Hello".to_string(),
                     HeaderCompProps {
                         title: "Hello, World!".to_string()
                     }
                 ),
                 (
-                    "Goodbye",
+                    "Goodbye".to_string(),
                     HeaderCompProps {
                         title: "Goodbye, World!".to_string()
                     }
@@ -55,14 +55,14 @@ pub fn app() -> Html {
             ImageComp,
             vec![
                 (
-                    "256",
+                    "256".to_string(),
                     ImageCompProps {
                         size: 256,
                         src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
                     }
                 ),
                 (
-                    "512",
+                    "512".to_string(),
                     ImageCompProps {
                         size: 512,
                         src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
@@ -73,8 +73,9 @@ pub fn app() -> Html {
     ];
 
     html! {
-        <div>
-            <PreviewPage {components} />
+        <div style="font-family: Arial, sans-serif;">
+            <h1 style="text-align: center;">{ "YewPreview Component Testing Framework" }</h1>
+            <PreviewPage components={components} />
         </div>
     }
 }

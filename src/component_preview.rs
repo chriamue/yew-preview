@@ -3,21 +3,20 @@ use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct ComponentPreviewProps {
-    pub item: ComponentItem,
+    pub item: Option<ComponentItem>,
 }
 
 #[function_component(ComponentPreview)]
 pub fn component_preview(props: &ComponentPreviewProps) -> Html {
-    let ComponentItem {
-        name,
-        render,
-        props,
-    } = &props.item;
-    html! {
-        <div>
-            <h2>{ name }</h2>
-            { render.clone() }
-            <p>{ props }</p>
-        </div>
+    if let Some(item) = &props.item {
+        html! {
+            <div>
+                <h2>{ &item.name }</h2>
+                { item.render.clone() }
+                <p>{ format!("{:?}", item.props) }</p>
+            </div>
+        }
+    } else {
+        html! { <div></div> }
     }
 }

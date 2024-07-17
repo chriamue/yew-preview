@@ -16,7 +16,7 @@ pub fn component_preview(props: &ComponentPreviewProps) -> Html {
             .find(|(name, _)| Some(name) == props.selected_property.as_ref())
         {
             html! {
-                <div>
+                <div style="border: 1px solid #ccc; width: 100%; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
                     <h2>{ &item.name }</h2>
                     { html.clone() }
                 </div>

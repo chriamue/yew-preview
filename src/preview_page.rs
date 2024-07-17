@@ -49,10 +49,18 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         .unwrap_or_else(Vec::new);
 
     html! {
-        <div>
-            <ComponentSelector components={(*components).clone()} on_select={on_component_select} />
-            <ComponentPreview item={selected_component.map(|index| components[index].clone())} selected_property={(*selected_property).clone()} />
-            <ConfigPanel properties={current_properties} on_select={on_property_select} />
+        <div style="display: flex; height: 100vh; flex-direction: column;">
+            <div style="display: flex; flex: 1;">
+                <div style="flex: 0 0 200px; padding: 20px; border-right: 1px solid #ccc;">
+                    <ComponentSelector components={(*components).clone()} on_select={on_component_select} />
+                </div>
+                <div style="flex: 1; padding: 20px;">
+                    <ComponentPreview item={selected_component.map(|index| components[index].clone())} selected_property={(*selected_property).clone()} />
+                </div>
+            </div>
+            <div style="flex: 0 0 200px; padding: 20px; border-top: 1px solid #ccc;">
+                <ConfigPanel properties={current_properties} on_select={on_property_select} />
+            </div>
         </div>
     }
 }

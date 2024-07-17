@@ -3,14 +3,12 @@ mod component_preview;
 mod component_selector;
 mod config_panel;
 mod preview_page;
-
-use yew::Html;
+use yew::prelude::*;
 
 #[derive(Clone, PartialEq)]
 pub struct ComponentItem {
     pub name: String,
-    pub render: Html,
-    pub props: Vec<(String, String)>,
+    pub render: Vec<(String, Html)>,
 }
 
 pub type ComponentList = Vec<ComponentItem>;

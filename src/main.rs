@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_preview::create_component_item;
 use yew_preview::prelude::*;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct HeaderCompProps {
     pub title: String,
 }
@@ -16,7 +16,7 @@ pub fn header_comp(props: &HeaderCompProps) -> Html {
     }
 }
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct ImageCompProps {
     pub src: String,
     pub size: u32,
@@ -34,18 +34,40 @@ pub fn app() -> Html {
     let components: ComponentList = vec![
         create_component_item!(
             "Header",
-            html! { <HeaderComp title={"Hello, Yew!"} /> },
-            vec![("Title".to_string(), "Hello, Yew!".to_string())]
+            HeaderComp,
+            vec![
+                (
+                    "Hello",
+                    HeaderCompProps {
+                        title: "Hello, World!".to_string()
+                    }
+                ),
+                (
+                    "Goodbye",
+                    HeaderCompProps {
+                        title: "Goodbye, World!".to_string()
+                    }
+                )
+            ]
         ),
         create_component_item!(
             "Image",
-            html! { <ImageComp src={"https://www.rust-lang.org/logos/rust-logo-512x512.png"} size={256} /> },
+            ImageComp,
             vec![
                 (
-                    "Src".to_string(),
-                    "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+                    "256",
+                    ImageCompProps {
+                        size: 256,
+                        src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+                    }
                 ),
-                ("Size".to_string(), "256".to_string())
+                (
+                    "512",
+                    ImageCompProps {
+                        size: 512,
+                        src: "https://www.rust-lang.org/logos/rust-logo-512x512.png".to_string()
+                    }
+                )
             ]
         ),
     ];

@@ -1,7 +1,8 @@
 use yew::prelude::*;
+
 #[derive(Properties, PartialEq, Clone)]
 pub struct ConfigPanelProps {
-    pub properties: Vec<(String, String)>,
+    pub properties: Vec<(String, Html)>,
     pub on_select: Callback<String>,
 }
 
@@ -11,11 +12,11 @@ pub fn config_panel(props: &ConfigPanelProps) -> Html {
         <div>
             <h2>{ "Select Property" }</h2>
             <ul>
-                { for props.properties.iter().map(|(name, prop)| {
+                { for props.properties.iter().map(|(name, _)| {
                     let on_click = {
                         let on_select = props.on_select.clone();
-                        let prop = prop.clone();
-                        Callback::from(move |_| on_select.emit(prop.clone()))
+                        let name = name.clone();
+                        Callback::from(move |_| on_select.emit(name.clone()))
                     };
                     html! {
                         <li>

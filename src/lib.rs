@@ -1,3 +1,4 @@
+pub mod component_macro;
 mod component_preview;
 mod component_selector;
 mod config_panel;

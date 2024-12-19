@@ -1,4 +1,4 @@
-use crate::ComponentItem;
+use crate::component_item::ComponentItem;
 
 pub trait Preview {
     fn preview() -> ComponentItem;

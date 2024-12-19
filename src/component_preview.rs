@@ -1,5 +1,5 @@
-use crate::ComponentItem;
-use yew::prelude::*;
+use crate::component_item::ComponentItem;
+use yew::prelude::{function_component, html, Html, Properties};
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct ComponentPreviewProps {

@@ -1,6 +1,6 @@
 use yew::prelude::*;
 use yew_preview::prelude::*;
-use yew_preview::{create_component_item, create_preview};
+use yew_preview::{create_component_group, create_component_item, create_preview};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct HeaderCompProps {
@@ -15,6 +15,27 @@ pub fn header_comp(props: &HeaderCompProps) -> Html {
         </header>
     }
 }
+
+#[derive(Properties, PartialEq, Clone)]
+pub struct FooterCompProps {
+    pub copyright: String,
+}
+
+#[function_component(FooterComp)]
+pub fn footer_comp(props: &FooterCompProps) -> Html {
+    html! {
+        <footer style="border-top: 1px solid #ccc; padding: 10px;">
+            <p>{ &props.copyright }</p>
+        </footer>
+    }
+}
+
+create_preview!(
+    FooterComp,
+    FooterCompProps {
+        copyright: "© 2021".to_string()
+    },
+);
 
 #[derive(Properties, PartialEq, Clone, Default)]
 pub struct ImageCompProps {
@@ -50,32 +71,36 @@ create_preview!(
 
 #[function_component(App)]
 pub fn app() -> Html {
-    let components: ComponentList = vec![
-        create_component_item!(
-            "Header",
-            HeaderComp,
-            vec![
-                (
-                    "Hello".to_string(),
-                    HeaderCompProps {
-                        title: "Hello, World!".to_string()
-                    }
-                ),
-                (
-                    "Goodbye".to_string(),
-                    HeaderCompProps {
-                        title: "Goodbye, World!".to_string()
-                    }
-                )
-            ]
+    let groups: ComponentList = vec![
+        create_component_group!(
+            "Layout Components",
+            create_component_item!(
+                "Header",
+                HeaderComp,
+                vec![
+                    (
+                        "Hello".to_string(),
+                        HeaderCompProps {
+                            title: "Hello, World!".to_string()
+                        }
+                    ),
+                    (
+                        "Goodbye".to_string(),
+                        HeaderCompProps {
+                            title: "Goodbye, World!".to_string()
+                        }
+                    )
+                ]
+            ),
+            FooterComp::preview()
         ),
-        ImageComp::preview(),
+        create_component_group!("Media Components", ImageComp::preview()),
     ];
 
     html! {
         <div style="font-family: Arial, sans-serif;">
             <h1 style="text-align: center;">{ "YewPreview Component Testing Framework" }</h1>
-            <PreviewPage components={components} />
+            <PreviewPage {groups} />
         </div>
     }
 }

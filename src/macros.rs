@@ -13,6 +13,17 @@ macro_rules! create_component_item {
         }
     };
 }
+
+#[macro_export]
+macro_rules! create_component_group {
+    ($name:expr, $($components:expr),* $(,)?) => {
+        ComponentGroup {
+            name: $name.to_string(),
+            components: vec![$($components),*],
+        }
+    };
+}
+
 #[macro_export]
 macro_rules! create_preview {
     ($component:ty, $default_props:expr, $(($prop_name:expr, $props:expr)),* $(,)?) => {

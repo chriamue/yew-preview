@@ -30,7 +30,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         })
     };
 
-    let on_component_select = {
+    let on_single_component_select = {
         let groups = groups.clone();
         let selected_group = selected_group.clone();
         let selected = selected_component.clone();
@@ -48,6 +48,27 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                 } else {
                     selected_property.set(None);
                 }
+            }
+        })
+    };
+
+    let on_tree_component_select = {
+        let groups = groups.clone();
+        let selected = selected_component.clone();
+        let selected_group = selected_group.clone();
+        let selected_property = selected_property.clone();
+        Callback::from(move |(group_index, comp_index)| {
+            selected_group.set(Some(group_index));
+            selected.set(Some(SelectedComponent {
+                group_index,
+                component_index: comp_index,
+            }));
+
+            let component = &groups[group_index].components[comp_index];
+            if !component.render.is_empty() {
+                selected_property.set(Some(component.render[0].0.clone()));
+            } else {
+                selected_property.set(None);
             }
         })
     };
@@ -74,13 +95,17 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         <div style="display: flex; height: 100vh; flex-direction: column;">
             <div style="display: flex; flex: 1;">
                 <div style="flex: 0 0 200px; padding: 20px; border-right: 1px solid #ccc;">
-                    <GroupSelector groups={(*groups).clone()} on_select={on_group_select.clone()} />
+                    <GroupSelector
+                        groups={(*groups).clone()}
+                        on_select={on_group_select.clone()}
+                        on_component_select={on_tree_component_select.clone()}
+                    />
                     {
                         if let Some(group_index) = *selected_group {
                             html! {
                                 <ComponentSelector
                                     group={groups[group_index].clone()}
-                                    on_select={on_component_select.clone()}
+                                    on_select={on_single_component_select.clone()}
                                 />
                             }
                         } else {

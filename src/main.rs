@@ -98,10 +98,29 @@ pub fn app() -> Html {
     ];
 
     html! {
-        <div style="font-family: Arial, sans-serif;">
-            <h1 style="text-align: center;">{ "YewPreview Component Testing Framework" }</h1>
-            <PreviewPage {groups} />
-        </div>
+        html! {
+            <div style="
+                font-family: Arial, sans-serif;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            ">
+                <div style="
+                    padding: 10px;
+                    background-color: #f8f8f8;
+                    border-bottom: 1px solid #ccc;
+                    flex-shrink: 0;
+                ">
+                    <h1 style="text-align: center;">
+                        { "YewPreview Component Testing Framework" }
+                    </h1>
+                </div>
+                <div style="flex: 1; overflow: hidden;">
+                    <PreviewPage {groups} />
+                </div>
+            </div>
+        }
     }
 }
 

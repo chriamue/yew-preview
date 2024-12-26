@@ -4,6 +4,7 @@ mod component_list;
 mod component_preview;
 mod component_selector;
 mod config_panel;
+pub mod examples;
 mod group_selector;
 pub mod macros;
 mod preview;

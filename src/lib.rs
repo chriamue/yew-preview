@@ -9,6 +9,7 @@ mod group_selector;
 pub mod macros;
 mod preview;
 mod preview_page;
+pub mod test_utils;
 
 pub mod prelude {
     pub use crate::component_group::ComponentGroup;
@@ -19,4 +20,8 @@ pub mod prelude {
     pub use crate::config_panel::ConfigPanel;
     pub use crate::preview::Preview;
     pub use crate::preview_page::PreviewPage;
+    pub use crate::test_utils::helpers::*;
+    pub use crate::test_utils::Matcher;
+    pub use crate::test_utils::TestCase;
+    pub use crate::test_utils::TestCases;
 }

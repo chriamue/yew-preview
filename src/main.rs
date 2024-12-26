@@ -30,6 +30,7 @@ pub fn app() -> Html {
                     )
                 ]
             ),
+            HeaderComp::preview(),
             FooterComp::preview()
         ),
         create_component_group!("Media Components", ImageComp::preview()),

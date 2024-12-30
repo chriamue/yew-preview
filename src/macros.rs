@@ -30,7 +30,7 @@ macro_rules! create_preview {
     ($component:ty, $default_props:expr, $(($prop_name:expr, $props:expr)),* $(,)?) => {
         impl Preview for $component {
             fn preview() -> ComponentItem {
-                let render: Vec<(String, Html)> = vec![
+                let mut render: Vec<(String, Html)> = vec![
                     (
                         "Default".to_string(),
                         html! { <$component ..$default_props /> },

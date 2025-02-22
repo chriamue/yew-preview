@@ -212,6 +212,20 @@ let groups = vec![
 
 YewPreview allows you to define tests for your components directly within the `create_preview_with_tests!` macro.  These tests use matchers to assert specific conditions about the rendered output.  See the example above for how to define the tests.
 
+## Projects Using YewPreview
+
+Here are some projects that use YewPreview to showcase and test their components:
+
+### Konnektoren-Yew
+
+A web application for learning German grammar, focused on connectors (Konnektoren) and conjunctions. Built with Yew, it offers interactive lessons across multiple language platforms.
+
+- **Demo:** [https://konnektoren.github.io/konnektoren-yew/](https://konnektoren.github.io/konnektoren-yew/)
+- **Repository:** [https://github.com/konnektoren/konnektoren-yew](https://github.com/konnektoren/konnektoren-yew)
+- **Features:** Multi-language support, interactive lessons, progress tracking, achievements, and SSI credential badges
+
+_Have a project using YewPreview? Submit a PR to add it here!_
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

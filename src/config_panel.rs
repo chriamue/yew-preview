@@ -15,16 +15,16 @@ pub fn config_panel(props: &ConfigPanelProps) -> Html {
             Callback::from(move |_| on_select.emit(name.clone()))
         };
         html! {
-            <li style="margin: 5px 0;">
+            <li class="yew-preview-property-item" style="margin: 5px 0;">
                 <button style="padding: 10px 15px; cursor: pointer;" onclick={on_click}>{ name }</button>
             </li>
         }
     });
 
     html! {
-        <div style="border: 1px solid #ccc; padding: 20px; width: 100%; max-width: 600px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <div class="yew-preview-config-panel" style="border: 1px solid #ccc; padding: 20px; width: 100%; max-width: 600px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
             <h2>{ "Select Property" }</h2>
-            <ul style="list-style: none; padding: 0;">
+            <ul class="yew-preview-property-list" style="list-style: none; padding: 0;">
                 { for list_items }
             </ul>
         </div>

@@ -16,16 +16,16 @@ pub fn component_selector(props: &SelectionProps) -> Html {
             Callback::from(move |_| on_select.emit(index))
         };
         html! {
-            <li style="margin: 5px 0;">
+            <li class="yew-preview-property-item" style="margin: 5px 0;">
                 <button style="padding: 10px 15px; cursor: pointer;" onclick={onclick}>{ name }</button>
             </li>
         }
     });
 
     html! {
-        <div style="margin-bottom: 20px;">
+        <div class="yew-preview-sidebar-section" style="margin-bottom: 20px;">
             <h2>{ "Select a Component" }</h2>
-            <ul style="list-style: none; padding: 0;">
+            <ul class="yew-preview-property-list" style="list-style: none; padding: 0;">
                 { for list_items }
             </ul>
         </div>

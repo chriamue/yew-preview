@@ -52,8 +52,6 @@ pub fn group_selector(props: &GroupSelectorProps) -> Html {
                     <ul style="list-style: none; padding-left: 25px; margin: 5px 0;">
                         { for group.components.iter().enumerate().map(|(comp_index, component)| {
                             let on_component_select = on_component_select.clone();
-                            let group_index = group_index;
-
                             html! {
                                 <li key={comp_index} style="margin: 3px 0;">
                                     <span

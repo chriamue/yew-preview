@@ -106,7 +106,7 @@ macro_rules! generate_component_test {
     (tokio, $component:ty, $test_name:ident, $props:expr, $test_cases:expr) => {
         #[tokio::test]
         async fn $test_name() {
-            let html = crate::test_utils::render_component::<$component>($props).await;
+            let html = $crate::test_utils::render_component::<$component>($props).await;
 
             for test_case in $test_cases {
                 assert!(
@@ -122,7 +122,7 @@ macro_rules! generate_component_test {
         paste::paste! {
             #[tokio::test]
             async fn [<tokio_test_ $component:snake _rendering>]() {
-                let html = crate::test_utils::render_component::<$component>($props).await;
+                let html = $crate::test_utils::render_component::<$component>($props).await;
 
                 for test_case in $test_cases {
                     assert!(
@@ -138,7 +138,7 @@ macro_rules! generate_component_test {
     (wasm, $component:ty, $test_name:ident, $props:expr, $test_cases:expr) => {
         #[wasm_bindgen_test]
         async fn $test_name() {
-            let html = crate::test_utils::render_component::<$component>($props).await;
+            let html = $crate::test_utils::render_component::<$component>($props).await;
 
             for test_case in $test_cases {
                 assert!(
@@ -154,7 +154,7 @@ macro_rules! generate_component_test {
         paste::paste! {
             #[wasm_bindgen_test]
             async fn [<wasm_test_ $component:snake _rendering>]() {
-                let html = crate::test_utils::render_component::<$component>($props).await;
+                let html = $crate::test_utils::render_component::<$component>($props).await;
 
                 for test_case in $test_cases {
                     assert!(

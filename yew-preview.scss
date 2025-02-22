@@ -4,6 +4,8 @@ $yew-preview-light-gray: #f4f4f4;
 $yew-preview-dark-gray: #333;
 $yew-preview-border: #ddd;
 $yew-preview-code-bg: #eee;
+$sidebar-width: 250px;
+$transition-duration: 0.3s;
 
 .yew-preview {
     font-family: Arial, sans-serif;
@@ -52,14 +54,20 @@ $yew-preview-code-bg: #eee;
         display: flex;
         flex: 1;
         overflow: hidden;
+        position: relative; // For absolute positioning of toggle button
     }
 
     &-sidebar {
-        width: 250px;
+        width: $sidebar-width;
         background-color: #f9f9f9;
         border-right: 1px solid $yew-preview-border;
         padding: 1em;
         overflow-y: auto;
+        transition: transform $transition-duration ease-in-out;
+
+        &.hidden {
+            transform: translateX(-$sidebar-width);
+        }
 
         ul {
             list-style-type: none;
@@ -75,6 +83,39 @@ $yew-preview-code-bg: #eee;
         flex: 1;
         padding: 1em;
         overflow-y: auto;
+        transition: margin-left $transition-duration ease-in-out;
+
+        &.full-width {
+            margin-left: 0;
+        }
+    }
+
+    &-toggle-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        padding: 8px 12px;
+        background-color: $yew-preview-primary;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all $transition-duration ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+            background-color: $yew-preview-primary-dark;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        &.sidebar-hidden {
+            left: 20px;
+        }
+
+        &.sidebar-visible {
+            left: calc(#{$sidebar-width} + 20px);
+        }
     }
 
     &-component {
@@ -84,6 +125,11 @@ $yew-preview-code-bg: #eee;
         margin-bottom: 1em;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: max-width $transition-duration ease-in-out;
+
+        &.full-width {
+            max-width: none;
+        }
     }
 
     &-config-panel {

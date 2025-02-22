@@ -23,6 +23,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     let selected_group = use_state(|| None::<usize>);
     let selected_component = use_state(|| None::<SelectedComponent>);
     let selected_property = use_state(|| None::<String>);
+    let is_sidebar_visible = use_state(|| true);
 
     let on_group_select = {
         let selected = selected_group.clone();
@@ -79,6 +80,13 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         Callback::from(move |prop| selected.set(Some(prop)))
     };
 
+    let toggle_sidebar = {
+        let is_sidebar_visible = is_sidebar_visible.clone();
+        Callback::from(move |_| {
+            is_sidebar_visible.set(!*is_sidebar_visible);
+        })
+    };
+
     let current_properties = selected_component
         .as_ref()
         .map(|selected| {
@@ -98,15 +106,20 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         on_tree_component_select: &Callback<(usize, usize)>,
         selected_group: Option<usize>,
         on_single_component_select: &Callback<usize>,
+        is_visible: bool,
     ) -> Html {
+        if !is_visible {
+            return html! {};
+        }
+
         html! {
             <div style="
-                flex: 0 0 250px;
-                border-right: 1px solid #ccc;
-                overflow-y: auto;
-                padding: 20px;
-                background-color: #f8f8f8;
-            ">
+                    flex: 0 0 250px;
+                    border-right: 1px solid #ccc;
+                    overflow-y: auto;
+                    padding: 20px;
+                    background-color: #f8f8f8;
+                ">
                 <GroupSelector
                     groups={groups.clone()}
                     on_select={on_group_select.clone()}
@@ -128,13 +141,42 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         }
     }
 
+    fn render_toggle_button(is_sidebar_visible: bool, onclick: Callback<MouseEvent>) -> Html {
+        html! {
+            <button
+                onclick={onclick}
+                style="
+                        position: fixed;
+                        top: 20px;
+                        left: 20px;
+                        z-index: 1000;
+                        padding: 8px 12px;
+                        border: none;
+                        border-radius: 4px;
+                        background-color: #007bff;
+                        color: white;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                    "
+            >
+                {
+                    if is_sidebar_visible {
+                        "Hide Sidebar"
+                    } else {
+                        "Show Sidebar"
+                    }
+                }
+            </button>
+        }
+    }
+
     fn render_preview_area(
         current_component: Option<ComponentItem>,
         selected_property: Option<String>,
     ) -> Html {
         html! {
             <div style="flex: 1; overflow-y: auto; padding: 20px;">
-                <div style="width: 100%; max-width: 800px; margin: 0 auto;">
+                <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
                     <ComponentPreview
                         item={current_component}
                         selected_property={selected_property}
@@ -187,12 +229,14 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
 
     html! {
         <div style="display: flex; height: 100%; max-height: 100%; overflow: hidden;">
+            { render_toggle_button(*is_sidebar_visible, toggle_sidebar.clone()) }
             { render_group_selector(
                 &groups,
                 &on_group_select,
                 &on_tree_component_select,
                 *selected_group,
-                &on_single_component_select
+                &on_single_component_select,
+                *is_sidebar_visible
             ) }
             { render_main_content(
                 current_component,

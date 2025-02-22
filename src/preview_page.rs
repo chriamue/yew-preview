@@ -4,6 +4,8 @@ use crate::component_preview::ComponentPreview;
 use crate::component_selector::ComponentSelector;
 use crate::config_panel::ConfigPanel;
 use crate::group_selector::GroupSelector;
+use crate::search_bar::SearchBar;
+use crate::search_results::SearchResults;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
@@ -24,6 +26,14 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     let selected_component = use_state(|| None::<SelectedComponent>);
     let selected_property = use_state(|| None::<String>);
     let is_sidebar_visible = use_state(|| true);
+    let search_query = use_state(String::new);
+
+    let on_search = {
+        let search_query = search_query.clone();
+        Callback::from(move |query: String| {
+            search_query.set(query);
+        })
+    };
 
     let on_group_select = {
         let selected = selected_group.clone();
@@ -107,6 +117,8 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         selected_group: Option<usize>,
         on_single_component_select: &Callback<usize>,
         is_visible: bool,
+        search_query: String,
+        on_search: Callback<String>,
     ) -> Html {
         if !is_visible {
             return html! {};
@@ -120,18 +132,32 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                     padding: 20px;
                     background-color: #f8f8f8;
                 ">
+                <SearchBar
+                    on_search={on_search}
+                    placeholder="Search components..."
+                />
+
                 <GroupSelector
                     groups={groups.clone()}
                     on_select={on_group_select.clone()}
                     on_component_select={on_tree_component_select.clone()}
                 />
+
+                <SearchResults
+                    groups={groups.clone()}
+                    search_query={search_query}
+                    on_select={on_tree_component_select.clone()}
+                />
+
                 {
                     if let Some(group_index) = selected_group {
                         html! {
-                            <ComponentSelector
-                                group={groups[group_index].clone()}
-                                on_select={on_single_component_select.clone()}
-                            />
+                            <div style="margin-top: 20px;">
+                                <ComponentSelector
+                                    group={groups[group_index].clone()}
+                                    on_select={on_single_component_select.clone()}
+                                />
+                            </div>
                         }
                     } else {
                         html! {}
@@ -231,13 +257,16 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         <div style="display: flex; height: 100%; max-height: 100%; overflow: hidden;">
             { render_toggle_button(*is_sidebar_visible, toggle_sidebar.clone()) }
             { render_group_selector(
-                &groups,
-                &on_group_select,
-                &on_tree_component_select,
-                *selected_group,
-                &on_single_component_select,
-                *is_sidebar_visible
-            ) }
+                    &groups,
+                    &on_group_select,
+                    &on_tree_component_select,
+                    *selected_group,
+                    &on_single_component_select,
+                    *is_sidebar_visible,
+                    (*search_query).clone(),
+                    on_search.clone(),
+                )
+            }
             { render_main_content(
                 current_component,
                 (*selected_property).clone(),

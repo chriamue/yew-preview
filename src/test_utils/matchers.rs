@@ -5,7 +5,8 @@ pub enum Matcher {
     HasClass(String),
     HasStyle(String, String),
     HasText(String),
-    Exists(String), // selector
+    Exists(String),
+    ElementCount(String, usize),
 }
 
 impl Matcher {
@@ -17,6 +18,10 @@ impl Matcher {
             Matcher::HasStyle(prop, value) => html.contains(&format!("{}: {}", prop, value)),
             Matcher::HasText(text) => html.contains(text),
             Matcher::Exists(selector) => html.contains(selector),
+            Matcher::ElementCount(selector, expected_count) => {
+                let count = html.matches(&format!("<{}", selector)).count();
+                count == *expected_count
+            }
         }
     }
 }
@@ -104,5 +109,37 @@ mod tests {
         let test_case = TestCase::new("Test");
         assert_eq!(test_case.name, "Test");
         assert!(test_case.matchers.is_empty());
+    }
+
+    #[test]
+    fn test_matcher_element_count() {
+        let matcher = Matcher::ElementCount("a".to_string(), 2);
+        assert!(matcher.matches("<a href='#'>Link 1</a><a href='#'>Link 2</a>"));
+        assert!(!matcher.matches("<a href='#'>Single Link</a>"));
+
+        let matcher_zero = Matcher::ElementCount("div".to_string(), 0);
+        assert!(matcher_zero.matches("<span>No divs here</span>"));
+        assert!(!matcher_zero.matches("<div>Has a div</div>"));
+    }
+
+    #[test]
+    fn test_matcher_element_count_nested() {
+        let matcher = Matcher::ElementCount("span".to_string(), 3);
+        assert!(matcher.matches("<div><span>1</span><span>2</span><span>3</span></div>"));
+        assert!(!matcher.matches("<div><span>1</span><span>2</span></div>"));
+    }
+
+    #[test]
+    fn test_test_case_with_element_count() {
+        let test_case = TestCase {
+            name: "Test".to_string(),
+            matchers: vec![
+                Matcher::ElementCount("a".to_string(), 2),
+                Matcher::HasText("Link".to_string()),
+            ],
+        };
+
+        assert!(test_case.matches("<div><a>Link 1</a><a>Link 2</a></div>"));
+        assert!(!test_case.matches("<div><a>Link 1</a></div>"));
     }
 }

@@ -3,6 +3,7 @@ use yew_preview::examples::{
     footer::FooterComp,
     header::{HeaderComp, HeaderCompProps},
     image::ImageComp,
+    project::ProjectComp,
 };
 use yew_preview::prelude::*;
 use yew_preview::{create_component_group, create_component_item};
@@ -34,6 +35,7 @@ pub fn app() -> Html {
             FooterComp::preview()
         ),
         create_component_group!("Media Components", ImageComp::preview()),
+        create_component_group!("Projects", ProjectComp::preview()),
     ];
 
     html! {

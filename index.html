@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Yew Preview</title>
+        <link rel="rust" href="src/main.rs" />
+        <link rel="stylesheet" href="/yew-preview/yew-preview-304bfa96283fba38.css" integrity="sha384&#x2D;G65WGET2Pty8me8xjOBEjuO6oWyCMRvVf6xQqkP7aE&#x2B;Cz7&#x2B;MGHsQDAtp46LhIdHb"/>
+    <link rel="modulepreload" href="/yew-preview/yew-preview-9d47b827b27a7a95.js" crossorigin="anonymous" integrity="sha384-gYnX2Q7mk4BNtUcUVkD/NZ/vrnSuTlkzI/CiIPLXOmIfJ2efvPFXfw+TZFMopykX"><link rel="preload" href="/yew-preview/yew-preview-9d47b827b27a7a95_bg.wasm" crossorigin="anonymous" integrity="sha384-bW/E0xYxGFdQv5LFVDkwxdbZbJ3FDJ3mi/Y3r6iKD+PD4U5LGrXS2lqghav34dAE" as="fetch" type="application/wasm"></head>
+    <body>
+<script type="module">
+import init, * as bindings from '/yew-preview/yew-preview-9d47b827b27a7a95.js';
+const wasm = await init({ module_or_path: '/yew-preview/yew-preview-9d47b827b27a7a95_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script></body>
+</html>

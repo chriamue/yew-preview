@@ -1,0 +1,206 @@
+.yew-preview {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.yew-preview h1,
+.yew-preview h2,
+.yew-preview h3,
+.yew-preview h4,
+.yew-preview h5,
+.yew-preview h6 {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+.yew-preview a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.yew-preview a:hover {
+    text-decoration: underline;
+}
+
+.yew-preview-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1em;
+}
+
+.yew-preview-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.yew-preview-header {
+    background-color: #fff;
+    padding: 1em;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+.yew-preview-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.yew-preview-sidebar {
+    width: 250px;
+    background-color: #f9f9f9;
+    border-right: 1px solid #ddd;
+    padding: 1em;
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+}
+
+.yew-preview-sidebar.hidden {
+    transform: translateX(-250px);
+}
+
+.yew-preview-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.yew-preview-sidebar li {
+    margin-bottom: 0.5em;
+}
+
+.yew-preview-search {
+    margin-bottom: 20px;
+}
+
+.yew-preview-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.yew-preview-search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.yew-preview .search-results h3 {
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.yew-preview .search-results button {
+    transition: all 0.2s ease;
+}
+
+.yew-preview .search-results button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yew-preview-main {
+    flex: 1;
+    padding: 1em;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.yew-preview-main.full-width {
+    margin-left: 0;
+}
+
+.yew-preview-toggle-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yew-preview-toggle-button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.yew-preview-toggle-button.sidebar-hidden {
+    left: 20px;
+}
+
+.yew-preview-toggle-button.sidebar-visible {
+    left: calc(250px + 20px);
+}
+
+.yew-preview-component {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: max-width 0.3s ease-in-out;
+}
+
+.yew-preview-component.full-width {
+    max-width: none;
+}
+
+.yew-preview-config-panel {
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    padding: 1em;
+    text-align: center;
+}
+
+.yew-preview-property-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.yew-preview-property-item {
+    margin-bottom: 0.5em;
+}
+
+.yew-preview button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.yew-preview button:hover {
+    background-color: #0056b3;
+}
+
+.yew-preview button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+}
+
+.yew-preview pre {
+    background-color: #eee;
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.yew-preview code {
+    font-family: monospace;
+}

@@ -20,8 +20,8 @@ pub fn component_preview(props: &ComponentPreviewProps) -> Html {
                     <h2 style="margin-top: 0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
                         { &item.name }
                     </h2>
-                    <div class="yew-preview-component-content" style="padding: 20px; border: 1px solid #eee; border-radius: 4px; background-color: #fff;">
-                        <div style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <div class="yew-preview-component-content" style="padding: 20px; border: 1px solid #eee; border-radius: 4px; background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%), linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%); background-size: 20px 20px; background-position: 0 0, 10px 10px;">
+                        <div style="min-height: 100px; display: flex; align-items: center; justify-content: center; background-color: #eee;">
                             { html.clone() }
                         </div>
                     </div>

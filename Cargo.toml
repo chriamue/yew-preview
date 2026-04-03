@@ -1,7 +1,11 @@
 [package]
 name = "yew-preview"
-version = "0.3.2"
-edition = "2021"
+version = "0.4.0"
+edition = "2024"
+authors = ["chriamue"]
+description = "A lightweight Rust library for quickly generating interactive component previews in Yew applications."
+license = "MIT"
+repository = "https://github.com/chriamue/yew-preview"
 
 [dependencies]
 yew = { version = "0.21.0", features = ["csr", "ssr"] }

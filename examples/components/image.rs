@@ -1,4 +1,4 @@
-use crate::{create_preview_with_tests, prelude::*};
+use yew_preview::{create_preview_with_tests, prelude::*};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone, Default)]

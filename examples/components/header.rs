@@ -1,5 +1,5 @@
-use crate::test_utils::{exists, has_style, has_text};
-use crate::{create_preview_with_tests, prelude::*};
+use yew_preview::test_utils::{exists, has_style, has_text};
+use yew_preview::{create_preview_with_tests, prelude::*};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
@@ -62,7 +62,7 @@ create_preview_with_tests!(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generate_component_test;
+    use yew_preview::generate_component_test;
 
     generate_component_test!(
         tokio,

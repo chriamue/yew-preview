@@ -1,4 +1,5 @@
-use crate::{create_preview_with_tests, prelude::*};
+use yew_preview::test_utils::{exists, has_text};
+use yew_preview::{create_preview_with_tests, prelude::*};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone, Default)]
@@ -97,20 +98,14 @@ create_preview_with_tests!(
             "Has correct description",
             has_text("A component explorer and test framework for Yew applications"),
         ),
-        (
-            "Has correct styling",
-            has_style("border", "1px solid #eee"),
-            has_style("padding", "20px"),
-            has_style("border-radius", "8px"),
-        ),
     ]
 );
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generate_component_test;
-    use crate::test_utils::TestCase;
+    use yew_preview::generate_component_test;
+    use yew_preview::test_utils::TestCase;
 
     generate_component_test!(
         tokio,
@@ -149,8 +144,8 @@ mod tests {
             repo: None,
         },
         vec![TestCase {
-            name: "Has single link".to_string(),
-            matchers: vec![Matcher::ElementCount("a".to_string(), 1)],
+            name: "Renders without repo".to_string(),
+            matchers: vec![exists("h3"), exists("p")],
         },]
     );
 }

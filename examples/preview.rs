@@ -1,36 +1,20 @@
 use yew::prelude::*;
-use yew_preview::examples::{
+use yew_preview::prelude::*;
+use yew_preview::create_component_group;
+
+mod components;
+use components::{
     footer::FooterComp,
-    header::{HeaderComp, HeaderCompProps},
+    header::HeaderComp,
     image::ImageComp,
     project::ProjectComp,
 };
-use yew_preview::prelude::*;
-use yew_preview::{create_component_group, create_component_item};
 
 #[function_component(App)]
 pub fn app() -> Html {
     let groups: ComponentList = vec![
         create_component_group!(
             "Layout Components",
-            create_component_item!(
-                "Header",
-                HeaderComp,
-                vec![
-                    (
-                        "Hello".to_string(),
-                        HeaderCompProps {
-                            title: "Hello, World!".to_string()
-                        }
-                    ),
-                    (
-                        "Goodbye".to_string(),
-                        HeaderCompProps {
-                            title: "Goodbye, World!".to_string()
-                        }
-                    )
-                ]
-            ),
             HeaderComp::preview(),
             FooterComp::preview()
         ),
@@ -46,7 +30,7 @@ pub fn app() -> Html {
                 </h1>
             </div>
             <div class="yew-preview-content" style="flex: 1; overflow: hidden;">
-                <PreviewPage {groups} />
+                <PreviewPage groups={groups} />
             </div>
         </div>
     }

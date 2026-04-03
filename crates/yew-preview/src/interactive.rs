@@ -6,6 +6,8 @@ use yew::Html;
 pub enum ArgValue {
     Bool(bool),
     Int(i64),
+    /// Ranged integer rendered as a slider: (value, min, max)
+    IntRange(i64, i64, i64),
     Float(f64),
     Text(String),
 }
@@ -44,7 +46,11 @@ pub fn get_bool(args: &[(String, ArgValue)], key: &str) -> bool {
 pub fn get_int(args: &[(String, ArgValue)], key: &str) -> i64 {
     args.iter()
         .find(|(k, _)| k == key)
-        .and_then(|(_, v)| if let ArgValue::Int(i) = v { Some(*i) } else { None })
+        .and_then(|(_, v)| match v {
+            ArgValue::Int(i) => Some(*i),
+            ArgValue::IntRange(i, _, _) => Some(*i),
+            _ => None,
+        })
         .unwrap_or_default()
 }
 

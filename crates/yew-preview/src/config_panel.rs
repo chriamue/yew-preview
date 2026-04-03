@@ -101,6 +101,34 @@ pub fn config_panel(props: &ConfigPanelProps) -> Html {
                             />
                         }
                     }
+                    ArgValue::IntRange(i, min, max) => {
+                        let val = *i;
+                        let min = *min;
+                        let max = *max;
+                        let on_arg_change = props.on_arg_change.clone();
+                        let name = name.clone();
+                        html! {
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input
+                                    type="range"
+                                    min={min.to_string()}
+                                    max={max.to_string()}
+                                    value={val.to_string()}
+                                    style="width: 140px; cursor: pointer;"
+                                    oninput={Callback::from(move |e: InputEvent| {
+                                        if let Some(input) = e.target()
+                                            .and_then(|t| t.dyn_into::<web_sys::HtmlInputElement>().ok())
+                                        {
+                                            if let Ok(n) = input.value().parse::<i64>() {
+                                                on_arg_change.emit((name.clone(), ArgValue::IntRange(n, min, max)));
+                                            }
+                                        }
+                                    })}
+                                />
+                                <span style="font-size: 0.85rem; color: #24292e; min-width: 36px;">{ val }</span>
+                            </div>
+                        }
+                    }
                     ArgValue::Float(f) => {
                         let val = *f;
                         let on_arg_change = props.on_arg_change.clone();

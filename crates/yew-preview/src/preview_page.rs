@@ -110,6 +110,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         .as_ref()
         .map(|selected| groups[selected.group_index].components[selected.component_index].clone());
 
+    #[allow(clippy::too_many_arguments)]
     fn render_group_selector(
         groups: &ComponentList,
         on_group_select: &Callback<usize>,

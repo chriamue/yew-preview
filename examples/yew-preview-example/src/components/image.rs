@@ -1,5 +1,5 @@
-use yew_preview::{create_preview_with_tests, prelude::*};
 use yew::prelude::*;
+use yew_preview::{create_preview_with_tests, prelude::*};
 
 #[derive(Properties, PartialEq, Clone, Default)]
 pub struct ImageCompProps {

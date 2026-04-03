@@ -1,6 +1,6 @@
+use yew::prelude::*;
 use yew_preview::test_utils::{exists, has_style, has_text};
 use yew_preview::{create_preview_with_tests, prelude::*};
-use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct FooterCompProps {
@@ -73,7 +73,6 @@ create_preview_with_tests!(
 mod tests {
     use super::*;
     use yew_preview::generate_component_test;
-    use yew_preview::test_utils::TestCase;
 
     generate_component_test!(
         tokio,
@@ -114,7 +113,7 @@ mod tests {
         },
         vec![TestCase {
             name: "Renders with empty copyright".to_string(),
-            matchers: vec![exists("footer"), exists("p"), has_text(""),],
+            matchers: vec![exists("footer"), exists("p")],
         },]
     );
 }

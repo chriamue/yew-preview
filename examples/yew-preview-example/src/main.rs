@@ -1,14 +1,9 @@
 use yew::prelude::*;
-use yew_preview::prelude::*;
 use yew_preview::create_component_group;
+use yew_preview::prelude::*;
 
 mod components;
-use components::{
-    footer::FooterComp,
-    header::HeaderComp,
-    image::ImageComp,
-    project::ProjectComp,
-};
+use components::{footer::FooterComp, header::HeaderComp, image::ImageComp, project::ProjectComp};
 
 #[function_component(App)]
 pub fn app() -> Html {

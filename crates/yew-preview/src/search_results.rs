@@ -24,8 +24,6 @@ pub fn search_results(props: &SearchResultsProps) -> Html {
                             if component.name.to_lowercase().contains(&props.search_query.to_lowercase()) {
                                 let on_select = {
                                     let on_select = props.on_select.clone();
-                                    let group_index = group_index;
-                                    let comp_index = comp_index;
                                     Callback::from(move |_| {
                                         on_select.emit((group_index, comp_index));
                                     })

@@ -12,3 +12,7 @@ yew = { version = "0.21", features = ["csr"] }
 yew-preview = { path = "../../crates/yew-preview" }
 paste = "1.0"
 web-sys = { version = "0.3", features = ["HtmlInputElement"] }
+
+[dev-dependencies]
+yew-preview = { path = "../../crates/yew-preview", features = ["testing"] }
+tokio = { version = "1.0", features = ["macros"] }

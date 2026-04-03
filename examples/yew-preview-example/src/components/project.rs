@@ -1,6 +1,6 @@
+use yew::prelude::*;
 use yew_preview::test_utils::{exists, has_text};
 use yew_preview::{create_preview_with_tests, prelude::*};
-use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone, Default)]
 pub struct ProjectCompProps {
@@ -103,9 +103,11 @@ create_preview_with_tests!(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::ProjectComp;
+    use super::ProjectCompProps;
     use yew_preview::generate_component_test;
-    use yew_preview::test_utils::TestCase;
+    use yew_preview::prelude::*;
+    use yew_preview::test_utils::exists;
 
     generate_component_test!(
         tokio,

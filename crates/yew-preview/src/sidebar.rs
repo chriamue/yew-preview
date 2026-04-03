@@ -109,7 +109,7 @@ fn render_component_selector(
     selected_group: Option<usize>,
     on_tree_component_select: &Callback<(usize, usize)>,
     search_query: String,
-    all_components: &Vec<(usize, usize, ComponentItem)>,
+    all_components: &[(usize, usize, ComponentItem)],
 ) -> Html {
     let mut all_rendered_components: Vec<Html> = Vec::new();
 
@@ -187,7 +187,6 @@ fn render_component_selector(
 
             let on_select = {
                 let on_tree_component_select = on_tree_component_select.clone();
-                let group_index = group_index;
                 let index_copy = index;
                 Callback::from(move |_| on_tree_component_select.emit((group_index, index_copy)))
             };

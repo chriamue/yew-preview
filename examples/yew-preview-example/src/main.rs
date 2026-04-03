@@ -8,9 +8,11 @@ mod pages;
 use components::{
     badge::Badge, code_snippet::CodeSnippet, feature_card::FeatureCard, footer::FooterComp,
     header::HeaderComp, image::ImageComp, project::ProjectComp,
+    prop_showcase::PropShowcase,
 };
 use pages::{
-    doc_page::DocPage, getting_started_page::GettingStartedPage, welcome_page::WelcomePage,
+    doc_page::DocPage, getting_started_page::GettingStartedPage,
+    interactive_page::InteractivePage, welcome_page::WelcomePage,
 };
 
 #[function_component(App)]
@@ -24,11 +26,13 @@ pub fn app() -> Html {
         create_component_group!(
             "Getting Started",
             GettingStartedPage::preview(),
+            InteractivePage::preview(),
             CodeSnippet::preview()
         ),
         create_component_group!("Documentation", DocPage::preview()),
         create_component_group!(
             "Example Components",
+            PropShowcase::preview(),
             Badge::preview(),
             HeaderComp::preview(),
             FooterComp::preview(),

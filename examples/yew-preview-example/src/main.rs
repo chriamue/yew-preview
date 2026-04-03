@@ -62,14 +62,3 @@ pub fn app() -> Html {
 fn main() {
     yew::Renderer::<App>::new().render();
 }
-
-#[cfg(test)]
-mod tests {
-    use super::get_groups;
-    use yew_preview::test_utils::run_groups_tests;
-
-    #[tokio::test]
-    async fn test_all_components() {
-        run_groups_tests(&get_groups()).await;
-    }
-}

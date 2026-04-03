@@ -32,38 +32,3 @@ create_preview_with_tests!(
         ("Has button element", exists("button")),
     ]
 );
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use yew_preview::prelude::*;
-    use yew_preview::test_utils::{exists, has_text};
-
-    /// Example of a failing test.
-    /// Run with: cargo test button_has_icon -- --ignored
-    #[tokio::test]
-    #[ignore = "demonstrates failing test output"]
-    async fn button_has_icon() {
-        let html = yew_preview::test_utils::render_component::<Button>(ButtonProps {
-            label: "Click me".to_string(),
-            disabled: false,
-        })
-        .await;
-
-        let mut tc = TestCase::new("Has icon element");
-        tc.matchers.push(exists("svg"));
-        tc.matchers.push(has_text("icon"));
-
-        let result = tc.run(&html);
-        if !result.passed {
-            let failures = result
-                .matchers
-                .iter()
-                .filter(|m| !m.passed)
-                .map(|m| format!("    ✗ {}", m.description))
-                .collect::<Vec<_>>()
-                .join("\n");
-            panic!("[Button] Test '{}' failed:\n{}", tc.name, failures);
-        }
-    }
-}

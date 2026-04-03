@@ -3,28 +3,46 @@ use yew_preview::create_component_group;
 use yew_preview::prelude::*;
 
 mod components;
-use components::{footer::FooterComp, header::HeaderComp, image::ImageComp, project::ProjectComp};
+mod pages;
+
+use components::{
+    code_snippet::CodeSnippet, feature_card::FeatureCard, footer::FooterComp, header::HeaderComp,
+    image::ImageComp, project::ProjectComp,
+};
+use pages::{
+    doc_page::DocPage, getting_started_page::GettingStartedPage, welcome_page::WelcomePage,
+};
 
 #[function_component(App)]
 pub fn app() -> Html {
     let groups: ComponentList = vec![
         create_component_group!(
-            "Layout Components",
-            HeaderComp::preview(),
-            FooterComp::preview()
+            "Overview",
+            WelcomePage::preview(),
+            FeatureCard::preview()
         ),
-        create_component_group!("Media Components", ImageComp::preview()),
-        create_component_group!("Projects", ProjectComp::preview()),
+        create_component_group!(
+            "Getting Started",
+            GettingStartedPage::preview(),
+            CodeSnippet::preview()
+        ),
+        create_component_group!("Documentation", DocPage::preview()),
+        create_component_group!(
+            "Example Components",
+            HeaderComp::preview(),
+            FooterComp::preview(),
+            ImageComp::preview(),
+            ProjectComp::preview()
+        ),
     ];
 
     html! {
-        <div class="yew-preview" style="font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
-            <div class="yew-preview-header" style="padding: 10px; background-color: #f8f8f8; border-bottom: 1px solid #ccc; flex-shrink: 0;">
-                <h1 style="text-align: center;">
-                    { "YewPreview Component Testing Framework" }
-                </h1>
+        <div style="font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
+            <div style="padding: 8px 20px; background: #24292e; flex-shrink: 0; display: flex; align-items: center; gap: 16px;">
+                <span style="color: #fff; font-weight: 700; font-size: 1.1rem;">{ "YewPreview" }</span>
+                <span style="color: #8b949e; font-size: 0.85rem;">{ "Interactive component browser for Yew" }</span>
             </div>
-            <div class="yew-preview-content" style="flex: 1; overflow: hidden;">
+            <div style="flex: 1; overflow: hidden;">
                 <PreviewPage groups={groups} />
             </div>
         </div>

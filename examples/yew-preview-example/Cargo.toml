@@ -12,6 +12,9 @@ yew = { workspace = true, features = ["csr"] }
 yew-preview = { path = "../../crates/yew-preview" }
 paste = "1.0"
 web-sys = { version = "0.3", features = ["HtmlInputElement"] }
+gloo-net = { version = "0.5", features = ["http"] }
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+wasm-bindgen-futures = "0.4"
 
 [dev-dependencies]
 yew-preview = { path = "../../crates/yew-preview", features = ["testing"] }

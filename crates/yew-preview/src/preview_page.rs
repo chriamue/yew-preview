@@ -111,7 +111,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         .map(|selected| groups[selected.group_index].components[selected.component_index].clone());
 
     #[allow(clippy::too_many_arguments)]
-    fn render_group_selector(
+    fn render_sidebar(
         groups: &ComponentList,
         on_group_select: &Callback<usize>,
         on_tree_component_select: &Callback<(usize, usize)>,
@@ -120,80 +120,86 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         is_visible: bool,
         search_query: String,
         on_search: Callback<String>,
+        toggle_sidebar: Callback<MouseEvent>,
     ) -> Html {
-        if !is_visible {
-            return html! {};
-        }
+        let toggle_label = if is_visible { "◀" } else { "▶" };
 
         html! {
             <div style="
-                    flex: 0 0 250px;
-                    border-right: 1px solid #ccc;
-                    overflow-y: auto;
-                    padding: 20px;
-                    background-color: #f8f8f8;
+                display: flex;
+                flex-direction: column;
+                flex: 0 0 auto;
+                border-right: 1px solid #e1e4e8;
+                background: #f6f8fa;
+                overflow: hidden;
+            ">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 12px;
+                    border-bottom: 1px solid #e1e4e8;
+                    flex-shrink: 0;
                 ">
-                <SearchBar
-                    on_search={on_search}
-                    placeholder="Search components..."
-                />
-
-                <GroupSelector
-                    groups={groups.clone()}
-                    on_select={on_group_select.clone()}
-                    on_component_select={on_tree_component_select.clone()}
-                />
-
-                <SearchResults
-                    groups={groups.clone()}
-                    search_query={search_query}
-                    on_select={on_tree_component_select.clone()}
-                />
-
-                {
-                    if let Some(group_index) = selected_group {
-                        html! {
-                            <div style="margin-top: 20px;">
-                                <ComponentSelector
-                                    group={groups[group_index].clone()}
-                                    on_select={on_single_component_select.clone()}
-                                />
-                            </div>
-                        }
-                    } else {
-                        html! {}
+                    <button
+                        onclick={toggle_sidebar}
+                        title={if is_visible { "Hide sidebar" } else { "Show sidebar" }}
+                        style="
+                            padding: 4px 8px;
+                            border: 1px solid #d0d7de;
+                            border-radius: 4px;
+                            background: #fff;
+                            color: #24292e;
+                            cursor: pointer;
+                            font-size: 0.85rem;
+                            line-height: 1;
+                        "
+                    >
+                        { toggle_label }
+                    </button>
+                    if is_visible {
+                        <span style="font-size: 0.8rem; color: #57606a; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase;">
+                            { "Components" }
+                        </span>
                     }
+                </div>
+
+                if is_visible {
+                    <div style="width: 250px; flex: 1; overflow-y: auto; padding: 12px;">
+                        <SearchBar
+                            on_search={on_search}
+                            placeholder="Search components..."
+                        />
+
+                        <GroupSelector
+                            groups={groups.clone()}
+                            on_select={on_group_select.clone()}
+                            on_component_select={on_tree_component_select.clone()}
+                        />
+
+                        <SearchResults
+                            groups={groups.clone()}
+                            search_query={search_query}
+                            on_select={on_tree_component_select.clone()}
+                        />
+
+                        {
+                            if let Some(group_index) = selected_group {
+                                html! {
+                                    <div style="margin-top: 16px;">
+                                        <ComponentSelector
+                                            group={groups[group_index].clone()}
+                                            on_select={on_single_component_select.clone()}
+                                        />
+                                    </div>
+                                }
+                            } else {
+                                html! {}
+                            }
+                        }
+                    </div>
                 }
             </div>
-        }
-    }
-
-    fn render_toggle_button(is_sidebar_visible: bool, onclick: Callback<MouseEvent>) -> Html {
-        html! {
-            <button
-                onclick={onclick}
-                style="
-                        position: fixed;
-                        top: 20px;
-                        left: 20px;
-                        z-index: 1000;
-                        padding: 8px 12px;
-                        border: none;
-                        border-radius: 4px;
-                        background-color: #007bff;
-                        color: white;
-                        cursor: pointer;
-                        transition: background-color 0.2s;
-                    "
-            >
-                {
-                    if is_sidebar_visible {
-                        "Hide Sidebar"
-                    } else {
-                        "Show Sidebar"
-                    }
-                }
-            </button>
         }
     }
 
@@ -219,11 +225,12 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     ) -> Html {
         html! {
             <div style="
-                border-top: 1px solid #ccc;
-                background-color: #f8f8f8;
-                padding: 20px;
+                border-top: 1px solid #e1e4e8;
+                background: #f6f8fa;
+                padding: 12px 20px;
                 display: flex;
                 justify-content: center;
+                flex-shrink: 0;
             ">
                 <div style="width: 100%; max-width: 600px;">
                     <ConfigPanel
@@ -255,9 +262,8 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     }
 
     html! {
-        <div style="display: flex; height: 100%; max-height: 100%; overflow: hidden;">
-            { render_toggle_button(*is_sidebar_visible, toggle_sidebar.clone()) }
-            { render_group_selector(
+        <div style="display: flex; height: 100%; overflow: hidden;">
+            { render_sidebar(
                     &groups,
                     &on_group_select,
                     &on_tree_component_select,
@@ -266,6 +272,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                     *is_sidebar_visible,
                     (*search_query).clone(),
                     on_search.clone(),
+                    toggle_sidebar,
                 )
             }
             { render_main_content(

@@ -12,6 +12,7 @@ concurrency:
 
 env:
   PUBLIC_URL: /${{ github.event.repository.name }}/
+  YEWPREVIEW_SOURCE_URL: https://github.com/${{ github.repository }}
 
 jobs:
   test:

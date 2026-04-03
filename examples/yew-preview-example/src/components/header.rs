@@ -56,6 +56,10 @@ create_preview_with_tests!(
             "Default title is present",
             has_text("Default Header"),
         ),
+        (
+            "Does not have h2 (demonstrating a failing test)",
+            exists("h2"),
+        ),
     ]
 );
 

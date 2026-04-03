@@ -14,13 +14,12 @@ All Yew components that make up the preview browser. They live in `crates/yew-pr
 ```mermaid
 graph TD
     PP[PreviewPage] --> SB[Sidebar]
-    PP --> MC[MainContent]
+    PP --> CP[ComponentPreview]
+    PP --> CFG[ConfigPanel]
     SB --> SR[SearchBar]
     SB --> GS[GroupSelector]
     SB --> CS[ComponentSelector]
     SB --> SRE[SearchResults]
-    MC --> CPR[ComponentPreview]
-    MC --> CFG[ConfigPanel]
 ```
 
 ## State & Callback Flow
@@ -33,15 +32,23 @@ sequenceDiagram
     participant ComponentPreview
     participant ConfigPanel
 
-    User->>Sidebar: click group
-    Sidebar->>PreviewPage: on_group_select(name)
-    PreviewPage->>Sidebar: selected_group prop updated
     User->>Sidebar: click component
-    Sidebar->>PreviewPage: on_component_select(name)
-    PreviewPage->>ComponentPreview: render variant[0]
+    Sidebar->>PreviewPage: on_component_select(group, index)
+    PreviewPage->>PreviewPage: init live_args from component.args
+    PreviewPage->>ComponentPreview: selected_property = first variant
+    PreviewPage->>ConfigPanel: show variant buttons [+ Interactive]
+
     User->>ConfigPanel: click variant button
-    ConfigPanel->>PreviewPage: on_variant_select(index)
-    PreviewPage->>ComponentPreview: render variant[index]
+    ConfigPanel->>PreviewPage: on_property_select(name)
+    PreviewPage->>ComponentPreview: render static variant
+
+    User->>ConfigPanel: click Interactive
+    ConfigPanel->>PreviewPage: on_property_select("Interactive")
+    PreviewPage->>ConfigPanel: show arg controls
+    User->>ConfigPanel: change arg value
+    ConfigPanel->>PreviewPage: on_arg_change(key, ArgValue)
+    PreviewPage->>PreviewPage: update live_args
+    PreviewPage->>ComponentPreview: call render_fn(live_args)
 ```
 
 ## `PreviewPage`
@@ -49,9 +56,7 @@ sequenceDiagram
 The root component. Compose the entire browser from groups.
 
 ```rust
-html! {
-    <PreviewPage groups={groups} />
-}
+html! { <PreviewPage groups={groups} /> }
 ```
 
 **Props:**
@@ -62,48 +67,53 @@ html! {
 
 **Internal state:**
 
-- Selected group name
-- Selected component name
-- Selected variant index
-- Search query string
-- Sidebar open/closed
+| State | Type | Description |
+|---|---|---|
+| `selected_group` | `Option<usize>` | Currently expanded group |
+| `selected_component` | `Option<SelectedComponent>` | Selected group + component indices |
+| `selected_property` | `Option<String>` | Active variant name or `"Interactive"` |
+| `live_args` | `Vec<(String, ArgValue)>` | Current arg values for interactive mode |
+| `search_query` | `String` | Current search input |
+| `is_sidebar_visible` | `bool` | Sidebar collapsed state |
 
-## `Sidebar`
+## `ComponentPreview`
 
-Left navigation panel. Contains `GroupSelector`, `ComponentSelector`, and `SearchBar`.
+Renders the active variant inside a checkerboard-background preview box.
 
-Rendered automatically by `PreviewPage`. Not usually used directly.
+- When `selected_property == "Interactive"` and the item has `args`: calls `render_fn(&live_args)` to produce fresh `Html`.
+- Otherwise: looks up the matching entry in `item.render` and displays the pre-rendered `Html`.
+
+## `ConfigPanel`
+
+Bottom bar that switches between variants and exposes arg controls.
+
+- Shows one button per static variant from `item.render`.
+- Adds a blue **Interactive** button when the component has `args`.
+- When **Interactive** is selected: renders an input control for each arg below the buttons.
+
+| `ArgValue` variant | Control rendered |
+|---|---|
+| `Text(String)` | `<input type="text">` |
+| `Bool(bool)` | `<input type="checkbox">` |
+| `Int(i64)` | `<input type="number">` |
+| `IntRange(val, min, max)` | `<input type="range">` + value label |
+| `Float(f64)` | `<input type="number" step="0.1">` |
 
 ## `GroupSelector`
 
-Collapsible tree of groups. Each group expands to show its component list. Clicking a group or component fires selection callbacks.
+Collapsible tree of groups. Each group expands to show its component list. Clicking a component fires `on_component_select(group_index, comp_index)`.
 
 ## `ComponentSelector`
 
 Flat list of `ComponentItem` names for the currently selected group.
 
-## `ComponentPreview`
-
-Renders the selected variant's `Html` inside a checkerboard-background preview box.
-
-## `ConfigPanel`
-
-Row of buttons — one per variant name — that switch the active variant inside `ComponentPreview`.
-
 ## `SearchBar`
 
-Controlled text input. Fires an `on_search: Callback<String>` on every keystroke.
-
-**Props:**
-
-| Prop | Type | Description |
-|---|---|---|
-| `placeholder` | `String` | Placeholder text |
-| `on_search` | `Callback<String>` | Called with the current query |
+Controlled text input. Fires `on_search: Callback<String>` on every keystroke.
 
 ## `SearchResults`
 
-Displays components matching the current search query, grouped by their parent group name. Clicking a result navigates to that component.
+Displays components matching the current search query across all groups. Clicking a result navigates directly to that component.
 
 ## Data Types
 
@@ -117,9 +127,17 @@ ComponentGroup {
 
 ComponentItem {
     name: String,
-    render: Vec<(String, Html)>,   // (variant name, rendered html)
+    render: Vec<(String, Html)>,         // static snapshot variants
+    args: Option<InteractiveArgs>,        // live-editing args, None for static-only
     test_cases: Vec<TestCase>,
 }
+
+InteractiveArgs {
+    values: Vec<(String, ArgValue)>,
+    render_fn: Rc<dyn Fn(&[(String, ArgValue)]) -> Html>,
+}
+
+ArgValue = Bool(bool) | Int(i64) | IntRange(i64, i64, i64) | Float(f64) | Text(String)
 ```
 
-See [[testing]] for `TestCase` and [[macros]] for how these are produced.
+See [[interactive]] for `ArgValue` usage and [[testing]] for `TestCase`.

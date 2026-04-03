@@ -7,7 +7,7 @@ tags: [examples, walkthrough]
 
 ← [[index]]
 
-The `examples/yew-preview-example/` directory is a complete Trunk WASM application that exercises all library features.
+The `examples/yew-preview-example/` directory is a complete Trunk WASM application that exercises all library features, including interactive previews.
 
 ## Running the Example
 
@@ -18,37 +18,98 @@ trunk serve
 
 Open `http://localhost:8080`.
 
-## Components Demonstrated
+## Group Structure
 
-### `HeaderComp`
+```mermaid
+graph TD
+    CL[ComponentList] --> G1[Overview]
+    CL --> G2[Getting Started]
+    CL --> G3[Documentation]
+    CL --> G4[Example Components]
+
+    G1 --> WP[WelcomePage\nstatic]
+    G1 --> FC[FeatureCard\nstatic variants]
+
+    G2 --> GS[GettingStartedPage\nstatic]
+    G2 --> IP[InteractivePage\nstatic tutorial]
+    G2 --> CS[CodeSnippet\nstatic]
+
+    G3 --> DP[DocPage\nfetches markdown]
+
+    G4 --> PS["PropShowcase\nall ArgValue types — Interactive only"]
+    G4 --> BD["Badge\nText + Bool — Interactive only"]
+    G4 --> IC["ImageComp\n256 / 512 static + Interactive slider"]
+    G4 --> HC[HeaderComp\nstatic + tests]
+    G4 --> FT[FooterComp\nstatic + tests]
+    G4 --> PR[ProjectComp\nstatic + tests]
+```
+
+## Pages
+
+### `WelcomePage`
+
+Hero section and feature grid. Demonstrates a documentation-style page component with no dynamic state.
+
+### `GettingStartedPage`
+
+Four-step guide using `CodeSnippet` components inline. Shows how to wire yew-preview into a new project.
+
+### `InteractivePage`
+
+Tutorial that documents all `ArgValue` types — table of variants, per-type code snippets, a full `create_interactive_preview!` example, and a mixed static+interactive example. Points to `PropShowcase` for a live demo.
+
+### `DocPage`
+
+Fetches Markdown files from GitHub (configured via `YEWPREVIEW_SOURCE_URL` env var at build time), preprocesses `[[wiki-link]]` syntax, and renders with `pulldown-cmark`. Demonstrates async data fetching in a preview component.
+
+## Interactive Components
+
+### `PropShowcase`
+
+Exercises every `ArgValue` type in one component:
+
+| Arg | Type | Control |
+|---|---|---|
+| `label` | `Text` | text input |
+| `enabled` | `Bool` | checkbox |
+| `count` | `Int` | number |
+| `size` | `IntRange(1, 200)` | slider → progress bar |
+| `ratio` | `Float` | number → opacity swatch |
+
+Uses a manual `Preview` impl (`render: vec![], args: Some(...)`). The UI auto-selects **Interactive** on load.
+
+### `Badge`
 
 ```rust
-#[derive(Properties, PartialEq)]
-pub struct HeaderProps {
-    pub title: String,
+pub struct BadgeProps {
+    pub label: AttrValue,
+    pub color: AttrValue,
+    pub rounded: bool,
 }
 ```
 
-Variants: *Default*, *Hello*, *Goodbye*
-
-Test cases: `h1` element exists, border style, padding, title text content.
-
-Uses `create_preview_with_tests!` and `generate_component_test!`.
-
-### `FooterComp`
-
-Footer counterpart to `HeaderComp`. Same pattern — useful for comparing layout-level components side by side in the browser.
+Uses `create_interactive_preview!` with `Text`, `Text`, and `Bool` args. Pure interactive — no static snapshots.
 
 ### `ImageComp`
 
 ```rust
-pub struct ImageProps {
+pub struct ImageCompProps {
     pub src: String,
-    pub alt: String,
+    pub size: u32,
 }
 ```
 
-Demonstrates media component preview with `img` element and alt text matchers.
+Demonstrates **mixed static + interactive**: two static snapshot tabs (256px, 512px) plus an **Interactive** tab with a `src` text input and a `size` slider (`IntRange(256, 24, 1024)`). Implemented with a manual `Preview` impl that populates both `render` and `args`.
+
+## Static Components with Tests
+
+### `HeaderComp`
+
+Variants: *Default*, *Hello*, *Goodbye*. Uses `create_preview_with_tests!` and `generate_component_test!`.
+
+### `FooterComp`
+
+Footer counterpart to `HeaderComp`. Two auto-generated tokio tests (full props + empty).
 
 ### `ProjectComp`
 
@@ -57,46 +118,23 @@ pub struct ProjectProps {
     pub title: String,
     pub description: String,
     pub url: String,
-    pub repo: Option<String>,   // optional
+    pub repo: Option<String>,
 }
 ```
 
-Variants: *YewPreview*, *Konnektoren*, *No Repo* (repo is `None`), *Long Description*
-
-Two separate `generate_component_test!` calls: one for the full props case, one for the no-repo case.
-
-## Group Structure
-
-```rust
-let groups = vec![
-    create_component_group!("Layout Components", HeaderComp, FooterComp),
-    create_component_group!("Media Components", ImageComp),
-    create_component_group!("Projects", ProjectComp),
-];
-```
-
-```mermaid
-graph TD
-    CL[ComponentList] --> G1[Layout Components]
-    CL --> G2[Media Components]
-    CL --> G3[Projects]
-    G1 --> H["HeaderComp\nDefault / Hello / Goodbye"]
-    G1 --> F[FooterComp]
-    G2 --> I["ImageComp\nsrc + alt"]
-    G3 --> P["ProjectComp\nYewPreview / Konnektoren\nNo Repo / Long Desc"]
-```
-
-This produces a three-group sidebar. Expanding each group shows the component list.
+Variants: *YewPreview*, *Konnektoren*, *No Repo*, *Long Description*. Two separate `generate_component_test!` calls — one for the full case, one for `repo: None`.
 
 ## What to Explore
 
-1. Open the sidebar → select *Layout Components* → click *HeaderComp*
-2. Switch variants with the config panel buttons at the bottom
-3. Use the search bar to filter across all groups
-4. Read `examples/yew-preview-example/src/components/header.rs` to see the full `create_preview_with_tests!` call alongside the component definition
+1. **Sidebar → Example Components → PropShowcase** — click **Interactive**, change any control
+2. **Sidebar → Example Components → ImageComp** — switch between 256, 512, and Interactive tabs; drag the size slider
+3. **Sidebar → Getting Started → InteractivePage** — read the arg type reference
+4. **Read `examples/yew-preview-example/src/components/badge.rs`** — minimal `create_interactive_preview!` usage
+5. **Read `examples/yew-preview-example/src/components/image.rs`** — manual `Preview` impl combining static and interactive
 
 ## Further Reading
 
-- How the macros work → [[macros]]
+- All macro options → [[macros]]
+- `ArgValue` types in detail → [[interactive]]
+- How `ConfigPanel` renders controls → [[components]]
 - How test cases run → [[testing]]
-- How `PreviewPage` orchestrates the UI → [[components]]

@@ -221,23 +221,21 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
 
     fn render_config_panel(
         properties: Vec<(String, Html)>,
+        selected: Option<String>,
         on_property_select: Callback<String>,
     ) -> Html {
         html! {
             <div style="
                 border-top: 1px solid #e1e4e8;
                 background: #f6f8fa;
-                padding: 12px 20px;
-                display: flex;
-                justify-content: center;
+                padding: 10px 16px;
                 flex-shrink: 0;
             ">
-                <div style="width: 100%; max-width: 600px;">
-                    <ConfigPanel
-                        properties={properties}
-                        on_select={on_property_select}
-                    />
-                </div>
+                <ConfigPanel
+                    properties={properties}
+                    selected={selected}
+                    on_select={on_property_select}
+                />
             </div>
         }
     }
@@ -255,8 +253,8 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                 flex-direction: column;
                 overflow: hidden;
             ">
-                { render_preview_area(current_component, selected_property) }
-                { render_config_panel(properties, on_property_select) }
+                { render_preview_area(current_component, selected_property.clone()) }
+                { render_config_panel(properties, selected_property, on_property_select) }
             </div>
         }
     }

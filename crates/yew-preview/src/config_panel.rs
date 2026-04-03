@@ -4,29 +4,40 @@ use yew::prelude::*;
 pub struct ConfigPanelProps {
     pub properties: Vec<(String, Html)>,
     pub on_select: Callback<String>,
+    pub selected: Option<String>,
 }
 
 #[function_component(ConfigPanel)]
 pub fn config_panel(props: &ConfigPanelProps) -> Html {
-    let list_items = props.properties.iter().map(|(name, _)| {
+    if props.properties.is_empty() {
+        return html! {};
+    }
+
+    let buttons = props.properties.iter().map(|(name, _)| {
+        let is_active = props.selected.as_deref() == Some(name.as_str());
         let on_click = {
             let on_select = props.on_select.clone();
             let name = name.clone();
             Callback::from(move |_| on_select.emit(name.clone()))
         };
+        let style = if is_active {
+            "padding: 5px 12px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; \
+             background: #24292e; color: #fff; border: 1px solid #24292e; font-weight: 600;"
+        } else {
+            "padding: 5px 12px; cursor: pointer; border-radius: 4px; font-size: 0.85rem; \
+             background: #fff; color: #24292e; border: 1px solid #d0d7de;"
+        };
         html! {
-            <li class="yew-preview-property-item" style="margin: 5px 0;">
-                <button style="padding: 10px 15px; cursor: pointer;" onclick={on_click}>{ name }</button>
-            </li>
+            <button style={style} onclick={on_click}>{ name }</button>
         }
     });
 
     html! {
-        <div class="yew-preview-config-panel" style="border: 1px solid #ccc; padding: 20px; width: 100%; max-width: 600px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-            <h2>{ "Select Property" }</h2>
-            <ul class="yew-preview-property-list" style="list-style: none; padding: 0;">
-                { for list_items }
-            </ul>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+            <span style="font-size: 0.75rem; color: #57606a; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;">
+                { "Variant" }
+            </span>
+            { for buttons }
         </div>
     }
 }

@@ -10,6 +10,7 @@ macro_rules! create_component_item {
                     (prop_name.to_string(), html)
                 })
                 .collect(),
+            args: None,
             test_cases: Vec::new(),
         }
     };
@@ -47,6 +48,7 @@ macro_rules! create_preview {
                 ComponentItem {
                     name: stringify!($component).to_string(),
                     render,
+                    args: None,
                     test_cases: Vec::new(),
                 }
             }
@@ -93,7 +95,38 @@ macro_rules! create_preview_with_tests {
                 ComponentItem {
                     name: stringify!($component).to_string(),
                     render,
+                    args: None,
                     test_cases,
+                }
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! create_interactive_preview {
+    (
+        $component:ty,
+        args: [$( ($arg_name:expr, $arg_value:expr) ),* $(,)?],
+        $render_fn:expr $(,)?
+    ) => {
+        impl Preview for $component {
+            fn preview() -> ComponentItem {
+                use std::rc::Rc;
+                let initial_args: Vec<(String, $crate::interactive::ArgValue)> = vec![
+                    $(($arg_name.to_string(), $arg_value),)*
+                ];
+                let render_fn: Rc<dyn Fn(&[(String, $crate::interactive::ArgValue)]) -> ::yew::Html> =
+                    Rc::new($render_fn);
+                let default_html = render_fn(&initial_args);
+                ComponentItem {
+                    name: stringify!($component).to_string(),
+                    render: vec![],
+                    args: Some($crate::interactive::InteractiveArgs {
+                        values: initial_args,
+                        render_fn,
+                    }),
+                    test_cases: Vec::new(),
                 }
             }
         }

@@ -5,6 +5,7 @@ mod component_preview;
 mod component_selector;
 mod config_panel;
 mod group_selector;
+pub mod interactive;
 mod macros;
 mod preview;
 mod preview_page;
@@ -19,6 +20,11 @@ pub mod prelude {
     pub use crate::component_list::ComponentList;
     pub use crate::preview::Preview;
     pub use crate::preview_page::PreviewPage;
+
+    // Interactive arg types and helpers
+    pub use crate::interactive::ArgValue;
+    pub use crate::interactive::InteractiveArgs;
+    pub use crate::interactive::{get_bool, get_float, get_int, get_text};
 
     // Test types (data structures, always available)
     pub use crate::test_utils::helpers::*;

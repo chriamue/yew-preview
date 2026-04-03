@@ -1,9 +1,9 @@
-use crate::component_item::ComponentItem;
 use crate::component_list::ComponentList;
 use crate::component_preview::ComponentPreview;
 use crate::component_selector::ComponentSelector;
 use crate::config_panel::ConfigPanel;
 use crate::group_selector::GroupSelector;
+use crate::interactive::ArgValue;
 use crate::search_bar::SearchBar;
 use crate::search_results::SearchResults;
 use yew::prelude::*;
@@ -27,6 +27,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     let selected_property = use_state(|| None::<String>);
     let is_sidebar_visible = use_state(|| true);
     let search_query = use_state(String::new);
+    let live_args = use_state(Vec::<(String, ArgValue)>::new);
 
     let on_search = {
         let search_query = search_query.clone();
@@ -47,6 +48,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         let selected_group = selected_group.clone();
         let selected = selected_component.clone();
         let selected_property = selected_property.clone();
+        let live_args = live_args.clone();
         Callback::from(move |comp_index| {
             if let Some(group_index) = *selected_group {
                 selected.set(Some(SelectedComponent {
@@ -55,8 +57,15 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                 }));
 
                 let component = &groups[group_index].components[comp_index];
+                if let Some(args) = &component.args {
+                    live_args.set(args.values.clone());
+                } else {
+                    live_args.set(vec![]);
+                }
                 if !component.render.is_empty() {
                     selected_property.set(Some(component.render[0].0.clone()));
+                } else if component.args.is_some() {
+                    selected_property.set(Some("Interactive".to_string()));
                 } else {
                     selected_property.set(None);
                 }
@@ -69,6 +78,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         let selected = selected_component.clone();
         let selected_group = selected_group.clone();
         let selected_property = selected_property.clone();
+        let live_args = live_args.clone();
         Callback::from(move |(group_index, comp_index)| {
             selected_group.set(Some(group_index));
             selected.set(Some(SelectedComponent {
@@ -77,8 +87,15 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
             }));
 
             let component = &groups[group_index].components[comp_index];
+            if let Some(args) = &component.args {
+                live_args.set(args.values.clone());
+            } else {
+                live_args.set(vec![]);
+            }
             if !component.render.is_empty() {
                 selected_property.set(Some(component.render[0].0.clone()));
+            } else if component.args.is_some() {
+                selected_property.set(Some("Interactive".to_string()));
             } else {
                 selected_property.set(None);
             }
@@ -88,6 +105,17 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     let on_property_select = {
         let selected = selected_property.clone();
         Callback::from(move |prop| selected.set(Some(prop)))
+    };
+
+    let on_arg_change = {
+        let live_args = live_args.clone();
+        Callback::from(move |(key, val): (String, ArgValue)| {
+            let mut updated = (*live_args).clone();
+            if let Some(entry) = updated.iter_mut().find(|(k, _)| k == &key) {
+                entry.1 = val;
+            }
+            live_args.set(updated);
+        })
     };
 
     let toggle_sidebar = {
@@ -109,6 +137,11 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     let current_component = selected_component
         .as_ref()
         .map(|selected| groups[selected.group_index].components[selected.component_index].clone());
+
+    let is_interactive = current_component
+        .as_ref()
+        .map(|c| c.args.is_some())
+        .unwrap_or(false);
 
     #[allow(clippy::too_many_arguments)]
     fn render_sidebar(
@@ -203,62 +236,6 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         }
     }
 
-    fn render_preview_area(
-        current_component: Option<ComponentItem>,
-        selected_property: Option<String>,
-    ) -> Html {
-        html! {
-            <div style="flex: 1; overflow-y: auto; padding: 20px;">
-                <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
-                    <ComponentPreview
-                        item={current_component}
-                        selected_property={selected_property}
-                    />
-                </div>
-            </div>
-        }
-    }
-
-    fn render_config_panel(
-        properties: Vec<(String, Html)>,
-        selected: Option<String>,
-        on_property_select: Callback<String>,
-    ) -> Html {
-        html! {
-            <div style="
-                border-top: 1px solid #e1e4e8;
-                background: #f6f8fa;
-                padding: 10px 16px;
-                flex-shrink: 0;
-            ">
-                <ConfigPanel
-                    properties={properties}
-                    selected={selected}
-                    on_select={on_property_select}
-                />
-            </div>
-        }
-    }
-
-    fn render_main_content(
-        current_component: Option<ComponentItem>,
-        selected_property: Option<String>,
-        properties: Vec<(String, Html)>,
-        on_property_select: Callback<String>,
-    ) -> Html {
-        html! {
-            <div style="
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-            ">
-                { render_preview_area(current_component, selected_property.clone()) }
-                { render_config_panel(properties, selected_property, on_property_select) }
-            </div>
-        }
-    }
-
     html! {
         <div style="display: flex; height: 100%; overflow: hidden;">
             { render_sidebar(
@@ -273,12 +250,36 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                     toggle_sidebar,
                 )
             }
-            { render_main_content(
-                current_component,
-                (*selected_property).clone(),
-                current_properties,
-                on_property_select
-            ) }
+            <div style="
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            ">
+                <div style="flex: 1; overflow-y: auto; padding: 20px;">
+                    <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                        <ComponentPreview
+                            item={current_component}
+                            selected_property={(*selected_property).clone()}
+                            live_args={(*live_args).clone()}
+                        />
+                    </div>
+                </div>
+                <div style="
+                    border-top: 1px solid #e1e4e8;
+                    background: #f6f8fa;
+                    padding: 10px 16px;
+                    flex-shrink: 0;
+                ">
+                    <ConfigPanel
+                        properties={current_properties}
+                        selected={(*selected_property).clone()}
+                        on_select={on_property_select}
+                        live_args={if is_interactive { Some((*live_args).clone()) } else { None }}
+                        on_arg_change={on_arg_change}
+                    />
+                </div>
+            </div>
         </div>
     }
 }

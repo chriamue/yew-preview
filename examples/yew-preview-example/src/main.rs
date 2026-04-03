@@ -6,8 +6,8 @@ mod components;
 mod pages;
 
 use components::{
-    code_snippet::CodeSnippet, feature_card::FeatureCard, footer::FooterComp, header::HeaderComp,
-    image::ImageComp, project::ProjectComp,
+    badge::Badge, code_snippet::CodeSnippet, feature_card::FeatureCard, footer::FooterComp,
+    header::HeaderComp, image::ImageComp, project::ProjectComp,
 };
 use pages::{
     doc_page::DocPage, getting_started_page::GettingStartedPage, welcome_page::WelcomePage,
@@ -29,6 +29,7 @@ pub fn app() -> Html {
         create_component_group!("Documentation", DocPage::preview()),
         create_component_group!(
             "Example Components",
+            Badge::preview(),
             HeaderComp::preview(),
             FooterComp::preview(),
             ImageComp::preview(),

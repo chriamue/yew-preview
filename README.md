@@ -3,18 +3,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Deploy](https://github.com/chriamue/yew-preview/workflows/GitHub%20Pages%20Deployment/badge.svg)](https://github.com/chriamue/yew-preview/actions/workflows/gh-pages.yml)
 
-**YewPreview** is a lightweight Rust library for interactive component previews in Yew applications — like Storybook, but for Rust. Register static snapshot variants or live-editable args, then browse everything in a sidebar UI served by `trunk serve`.
+**YewPreview** is a lightweight Rust library for interactive component previews in Yew applications — like Storybook, but for Rust. Register static snapshot variants, live-editable args, and SSR test cases, then browse everything in a sidebar UI served by `trunk serve`.
 
 > **Note:** This library is primarily built for personal use cases. It is not actively maintained and breaking changes may occur without notice. Use it as inspiration or a starting point rather than a production dependency.
 
 ## Features
 
-- 🚀 **Fast Setup** — Add previews directly to your component files with minimal boilerplate
-- 📦 **Macro-Powered** — `create_preview!` and `create_interactive_preview!` macros
-- 🎛️ **Live Prop Editing** — Edit `Text`, `Bool`, `Int`, `IntRange` (slider), and `Float` args in the browser without recompiling
-- 🎯 **Feature-Gated** — Preview code compiles out of production builds
-- 🧪 **Testing** — Built-in matchers and `generate_component_test!` for SSR validation
-- 🔄 **Quick Iteration** — Trunk hot reload during development
+- **Fast Setup** — Add previews and tests directly to your component files with minimal boilerplate
+- **Macro-Powered** — `create_preview_with_tests!` covers static variants + SSR tests in one call
+- **Live Prop Editing** — Edit `Text`, `Bool`, `Int`, `IntRange` (slider), and `Float` args in the browser without recompiling
+- **SSR Testing** — Built-in matchers run against server-rendered HTML; failures appear in both `cargo test` and the browser UI
+- **Failing-test workflow** — Enable the `tests-ignored` feature to mark all generated tests as `#[ignore]` so a broken component never blocks CI
 
 ## Quick Start
 
@@ -24,19 +23,23 @@
 [dependencies]
 yew = { version = "0.23", features = ["csr"] }
 yew-preview = { git = "https://github.com/chriamue/yew-preview" }
+
+[dev-dependencies]
+yew-preview = { git = "https://github.com/chriamue/yew-preview", features = ["testing"] }
 ```
 
-### 2. Static Variants
+### 2. Static Variants + Tests
 
-Register named snapshot variants with `create_preview!`:
+`create_preview_with_tests!` registers named snapshot variants and SSR test cases in one macro call. The macro generates an `impl Preview` and a `#[tokio::test]` that runs every test against every variant.
 
 ```rust
 use yew::prelude::*;
 use yew_preview::prelude::*;
+use yew_preview::{create_preview_with_tests, test_utils::exists};
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct ButtonProps {
-    pub label: AttrValue,
+    pub label: String,
     pub disabled: bool,
 }
 
@@ -45,11 +48,22 @@ pub fn button(props: &ButtonProps) -> Html {
     html! { <button disabled={props.disabled}>{ &props.label }</button> }
 }
 
-yew_preview::create_preview!(
-    Button,
-    ButtonProps { label: AttrValue::from("Click me"), disabled: false },
-    ("Disabled", ButtonProps { label: AttrValue::from("Can't click"), disabled: true }),
+create_preview_with_tests!(
+    component: Button,
+    default_props: ButtonProps { label: "Click me".to_string(), disabled: false },
+    variants: [
+        ("Disabled", ButtonProps { label: "Disabled".to_string(), disabled: true }),
+    ],
+    tests: [
+        ("Has button element", exists("button")),
+    ]
 );
+```
+
+Running `cargo test` shows a result per component:
+
+```
+test components::button::button_preview::default ... ok
 ```
 
 ### 3. Interactive Previews
@@ -57,6 +71,8 @@ yew_preview::create_preview!(
 Use `create_interactive_preview!` to make props editable live in the browser:
 
 ```rust
+use yew_preview::prelude::*;
+
 yew_preview::create_interactive_preview!(
     Button,
     args: [
@@ -66,60 +82,30 @@ yew_preview::create_interactive_preview!(
     |args| {
         let label    = get_text(args, "label");
         let disabled = get_bool(args, "disabled");
-        html! {
-            <Button label={AttrValue::from(label)} disabled={disabled} />
-        }
+        html! { <Button label={label} disabled={disabled} /> }
     }
 );
 ```
 
-For a size slider, use `IntRange(value, min, max)`:
+For a size slider use `IntRange(value, min, max)`:
 
 ```rust
 ("size", ArgValue::IntRange(256, 24, 1024))
 // read with: get_int(args, "size") as u32
 ```
 
-### 4. Mix Static and Interactive
-
-Set both `render` and `args` in a manual `Preview` impl to get static snapshot tabs alongside an **Interactive** tab:
-
-```rust
-impl Preview for ImageComp {
-    fn preview() -> ComponentItem {
-        ComponentItem {
-            name: "ImageComp".to_string(),
-            render: vec![
-                ("256".to_string(), html! { <ImageComp src={SRC} size={256u32} /> }),
-                ("512".to_string(), html! { <ImageComp src={SRC} size={512u32} /> }),
-            ],
-            args: Some(InteractiveArgs {
-                values: vec![
-                    ("src".to_string(),  ArgValue::Text(SRC.to_string())),
-                    ("size".to_string(), ArgValue::IntRange(256, 24, 1024)),
-                ],
-                render_fn: Rc::new(|args| {
-                    let src  = get_text(args, "src");
-                    let size = get_int(args, "size") as u32;
-                    html! { <ImageComp src={src} size={size} /> }
-                }),
-            }),
-            test_cases: vec![],
-        }
-    }
-}
-```
-
-### 5. Build the Preview App
+### 4. Build the Preview App
 
 ```rust
 use yew_preview::{create_component_group, prelude::*};
 
-let groups: ComponentList = vec![
-    create_component_group!("Buttons", Button::preview()),
-];
+fn get_groups() -> ComponentList {
+    vec![
+        create_component_group!("Buttons", Button::preview()),
+    ]
+}
 
-html! { <PreviewPage groups={groups} /> }
+html! { <PreviewPage groups={get_groups()} /> }
 ```
 
 ```bash
@@ -127,6 +113,56 @@ trunk serve
 ```
 
 Open `http://localhost:8080` to browse your previews.
+
+### 5. Integration Test for All Components
+
+Call `run_groups_tests` from a single `#[tokio::test]` to run every component's SSR tests at once:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::get_groups;
+    use yew_preview::test_utils::run_groups_tests;
+
+    #[tokio::test]
+    async fn test_all_components() {
+        run_groups_tests(&get_groups()).await;
+    }
+}
+```
+
+## Failing Tests and `tests-ignored`
+
+When a component has a failing test, it shows as failing in both the browser UI (test panel) and in `cargo test`:
+
+```
+test components::card::card_comp_preview::default ... FAILED
+
+---- components::card::card_comp_preview::default stdout ----
+  [CardComp] [Default] ✓ Has card element
+  [CardComp] [Default] ✓ Has heading
+thread '...' panicked at src/components/card.rs:30:1:
+[CardComp] [Default] Test 'Has close button' failed:
+    ✗ element exists: button
+```
+
+To keep CI green while a test is known-failing, enable the `tests-ignored` feature on `yew-preview`. All macro-generated tests become `#[ignore]`:
+
+```toml
+[dev-dependencies]
+yew-preview = { git = "...", features = ["testing", "tests-ignored"] }
+```
+
+```
+test components::card::card_comp_preview::default ... ignored, tests-ignored feature enabled
+test result: ok. 0 passed; 0 failed; 7 ignored
+```
+
+Run the ignored tests explicitly when you want to see them:
+
+```bash
+cargo test -- --ignored
+```
 
 ## `ArgValue` Types
 
@@ -145,10 +181,10 @@ Full notes live in [`docs/`](docs/):
 | Note | Contents |
 |---|---|
 | [Getting Started](docs/getting-started.md) | Install, first preview, run |
-| [Interactive Previews](docs/interactive.md) | `ArgValue` types, `create_interactive_preview!`, sliders, mixed mode |
-| [Macros Reference](docs/macros.md) | All macros including `create_interactive_preview!` |
+| [Interactive Previews](docs/interactive.md) | `ArgValue` types, `create_interactive_preview!`, sliders |
+| [Macros Reference](docs/macros.md) | All macros |
 | [UI Components](docs/components.md) | `PreviewPage`, `ConfigPanel`, data types, state flow |
-| [Testing](docs/testing.md) | Matchers, `TestCase`, `render_component` |
+| [Testing](docs/testing.md) | Matchers, `TestCase`, `render_component`, `tests-ignored` |
 | [Architecture](docs/architecture.md) | Crate layout, feature flags, design decisions |
 | [Examples](docs/examples.md) | Annotated walkthrough of the bundled example |
 

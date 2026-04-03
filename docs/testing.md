@@ -9,19 +9,6 @@ tags: [testing, matchers, test-utils]
 
 YewPreview ships built-in test utilities behind the `testing` feature flag. They use Yew's `LocalServerRenderer` for server-side rendering so tests run without a browser.
 
-## Test Execution Flow
-
-```mermaid
-flowchart TD
-    GCT[generate_component_test!] -->|expands to| TF[async test fn]
-    TF --> RC[render_component C props .await]
-    RC --> LSR["LocalServerRenderer\nSSR to HTML string"]
-    LSR --> MR["run TestCase.matches html"]
-    MR --> MA{all matchers pass?}
-    MA -->|yes| PASS[test passes]
-    MA -->|no| FAIL[panic with failing matcher]
-```
-
 ## Enabling the Testing Feature
 
 ```toml
@@ -29,28 +16,68 @@ flowchart TD
 yew-preview = { git = "https://github.com/chriamue/yew-preview", features = ["testing"] }
 ```
 
+## `create_preview_with_tests!`
+
+The primary way to add SSR tests. Embed test cases directly in the preview declaration — the macro generates both `impl Preview` and a `#[tokio::test]` that runs every test against every variant:
+
+```rust
+use yew_preview::test_utils::exists;
+use yew_preview::{create_preview_with_tests, prelude::*};
+
+create_preview_with_tests!(
+    component: Button,
+    default_props: ButtonProps { label: "Click me".to_string(), disabled: false },
+    variants: [
+        ("Disabled", ButtonProps { label: "Disabled".to_string(), disabled: true }),
+    ],
+    tests: [
+        ("Has button element", exists("button")),
+        ("Has label text",     Matcher::HasText("Click me".to_string())),
+    ]
+);
+```
+
+Each test tuple is `("name", matcher1, matcher2, ...)`. Multiple matchers in one test case all run against the same rendered HTML.
+
+## Test Execution Flow
+
+```
+cargo test
+  └─ {component}_preview::default
+       └─ for each variant
+            └─ render_component(props)  →  HTML string
+                 └─ for each TestCase
+                      └─ all matchers pass?  →  ✓ / panic with failure details
+```
+
+Failures report which variant and matcher failed, plus the source location:
+
+```
+thread '...' panicked at src/components/card.rs:30:1:
+[CardComp] [Default] Test 'Has close button' failed:
+    ✗ element exists: button
+```
+
+## Integration Test for All Components
+
+Call `run_groups_tests` from a single test to cover every component at once:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::get_groups;
+    use yew_preview::test_utils::run_groups_tests;
+
+    #[tokio::test]
+    async fn test_all_components() {
+        run_groups_tests(&get_groups()).await;
+    }
+}
+```
+
 ## Matchers
 
 `Matcher` is an enum that describes one assertion against rendered HTML.
-
-```mermaid
-classDiagram
-    class Matcher {
-        Contains(String)
-        HasText(String)
-        HasClass(String)
-        HasStyle(String, String)
-        HasAttribute(String, String)
-        Exists(String)
-        ElementCount(String, usize)
-    }
-    class TestCase {
-        +name: String
-        +matchers: Vec~Matcher~
-        +matches(html: &str) bool
-    }
-    TestCase "1" --> "*" Matcher
-```
 
 | Variant | Checks |
 |---|---|
@@ -67,58 +94,12 @@ classDiagram
 ```rust
 use yew_preview::test_utils::*;
 
+exists("h1")                         // Matcher::Exists
 has_text("Hello")                    // Matcher::HasText
 has_class("btn-primary")             // Matcher::HasClass
 has_style("color", "red")            // Matcher::HasStyle
 has_attribute("disabled", "true")    // Matcher::HasAttribute
-exists("h1")                         // Matcher::Exists
 ```
-
-## TestCase
-
-Groups matchers under a name.
-
-```rust
-TestCase {
-    name: "has heading".to_string(),
-    matchers: vec![exists("h1"), has_text("Welcome")],
-}
-```
-
-`test_case.matches(&html_string)` returns `true` if **all** matchers pass.
-
-## Writing Tests with `create_preview_with_tests!`
-
-Embed test cases directly in the preview declaration:
-
-```rust
-yew_preview::create_preview_with_tests!(
-    HeaderComp,
-    HeaderProps { title: "Test".to_string() },
-    [
-        ("renders h1",   vec![exists("h1")]),
-        ("has title",    vec![has_text("Test")]),
-        ("has border",   vec![has_style("border", "1px solid black")]),
-    ],
-    ("Alt title", HeaderProps { title: "Alt".to_string() }),
-);
-```
-
-## Running Tests with `generate_component_test!`
-
-Generates a full async test function:
-
-```rust
-#[cfg(test)]
-mod tests {
-    use super::*;
-    yew_preview::generate_component_test!(HeaderComp, HeaderProps {
-        title: "Test".to_string(),
-    });
-}
-```
-
-This calls `render_component::<HeaderComp>(props).await`, then runs every matcher from the component's `test_cases`. Failures are reported per test case.
 
 ## `render_component`
 
@@ -129,4 +110,26 @@ let html = yew_preview::test_utils::render_component::<MyComp>(props).await;
 assert!(html.contains("expected text"));
 ```
 
-Useful when you want to write custom assertions outside of the matcher framework.
+## Failing Tests and `tests-ignored`
+
+When a test fails it is visible in both `cargo test` output and the browser UI test panel. This is intentional — the browser shows which test cases pass or fail for each variant.
+
+To keep CI green while a test is known-failing, enable the `tests-ignored` feature on `yew-preview`. All macro-generated tests are marked `#[ignore]`:
+
+```toml
+[dev-dependencies]
+yew-preview = { git = "...", features = ["testing", "tests-ignored"] }
+```
+
+```
+test components::card::card_comp_preview::default ... ignored, tests-ignored feature enabled
+test result: ok. 0 passed; 0 failed; 7 ignored
+```
+
+Run the ignored tests explicitly at any time:
+
+```bash
+cargo test -- --ignored
+```
+
+The `tests-ignored` feature only affects the generated `#[tokio::test]` functions. The test cases are still stored in `ComponentItem.test_cases` and shown in the browser UI regardless.

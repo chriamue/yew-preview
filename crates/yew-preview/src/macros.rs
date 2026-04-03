@@ -1,3 +1,27 @@
+/// Internal helper: emits `#[tokio::test]` + optionally `#[ignore]` when the
+/// `tests-ignored` feature is active on `yew-preview`. Use via `$crate::` so
+/// the cfg is evaluated against yew-preview's features, not the caller's.
+#[cfg(not(feature = "tests-ignored"))]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tokio_test_maybe_ignored {
+    (async fn $name:ident() $body:block) => {
+        #[tokio::test]
+        async fn $name() $body
+    };
+}
+
+#[cfg(feature = "tests-ignored")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tokio_test_maybe_ignored {
+    (async fn $name:ident() $body:block) => {
+        #[tokio::test]
+        #[ignore = "tests-ignored feature enabled"]
+        async fn $name() $body
+    };
+}
+
 #[macro_export]
 macro_rules! create_component_item {
     ($name:expr, $component:ty, $props:expr) => {
@@ -145,16 +169,17 @@ macro_rules! create_preview_with_tests {
             }
         }
 
-        // Generate a test module per component with one test per variant.
-        // Module name groups the tests: `{component}_preview::default`, `::hello`, etc.
+        // Generate a test module per component. The test is ignored when the
+        // `tests-ignored` feature of yew-preview is active.
         #[cfg(test)]
         paste::paste! {
             mod [<$component:snake _preview>] {
-                #[tokio::test]
-                async fn default() {
-                    let item = <super::$component as $crate::prelude::Preview>::preview();
-                    if let Some(runner) = &item.ssr_runner {
-                        runner().await;
+                $crate::__tokio_test_maybe_ignored! {
+                    async fn default() {
+                        let item = <super::$component as $crate::prelude::Preview>::preview();
+                        if let Some(runner) = &item.ssr_runner {
+                            runner().await;
+                        }
                     }
                 }
             }

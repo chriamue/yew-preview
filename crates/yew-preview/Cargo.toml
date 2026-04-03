@@ -10,6 +10,7 @@ repository.workspace = true
 [features]
 default = []
 testing = ["yew/ssr"]
+tests-ignored = []
 
 [dependencies]
 yew = { workspace = true }

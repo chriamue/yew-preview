@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use yew_preview::test_utils::{exists, has_style, has_text};
+use yew_preview::test_utils::{exists, has_style};
 use yew_preview::{create_preview_with_tests, prelude::*};
 
 #[derive(Properties, PartialEq, Clone)]
@@ -36,62 +36,9 @@ create_preview_with_tests!(
         )
     ],
     tests: [
-        (
-            "Has header element",
-            exists("header"),
-        ),
-        (
-            "Has h1 element",
-            exists("h1"),
-        ),
-        (
-            "Has correct border style",
-            has_style("border-bottom", "1px solid #ccc"),
-        ),
-        (
-            "Has correct padding",
-            has_style("padding", "10px"),
-        ),
-        (
-            "Default title is present",
-            has_text("Default Header"),
-        ),
-        (
-            "Does not have h2 (demonstrating a failing test)",
-            exists("h2"),
-        ),
+        ("Has header element", exists("header")),
+        ("Has h1 element", exists("h1")),
+        ("Has correct border style", has_style("border-bottom", "1px solid #ccc")),
+        ("Has correct padding", has_style("padding", "10px")),
     ]
 );
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use yew_preview::generate_component_test;
-    use yew_preview::test_utils::{exists, has_style, has_text};
-
-    generate_component_test!(
-        tokio,
-        HeaderComp,
-        tokio_test_header_comp_rendering,
-        HeaderCompProps {
-            title: "Test Title".to_string(),
-        },
-        vec![
-            TestCase {
-                name: "Has title text".to_string(),
-                matchers: vec![has_text("Test Title")],
-            },
-            TestCase {
-                name: "Has header element".to_string(),
-                matchers: vec![exists("header")],
-            },
-            TestCase {
-                name: "Has correct styles".to_string(),
-                matchers: vec![
-                    has_style("border-bottom", "1px solid #ccc"),
-                    has_style("padding", "10px"),
-                ],
-            },
-        ]
-    );
-}

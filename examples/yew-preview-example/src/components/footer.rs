@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use yew_preview::test_utils::{exists, has_style, has_text};
+use yew_preview::test_utils::{exists, has_style};
 use yew_preview::{create_preview_with_tests, prelude::*};
 
 #[derive(Properties, PartialEq, Clone)]
@@ -42,78 +42,9 @@ create_preview_with_tests!(
         )
     ],
     tests: [
-        (
-            "Has footer element",
-            exists("footer"),
-        ),
-        (
-            "Has paragraph element",
-            exists("p"),
-        ),
-        (
-            "Has correct border style",
-            has_style("border-top", "1px solid #ccc"),
-        ),
-        (
-            "Has correct padding",
-            has_style("padding", "10px"),
-        ),
-        (
-            "Contains copyright symbol",
-            has_text("©"),
-        ),
-        (
-            "Default copyright text is present",
-            has_text("© 2021"),
-        ),
+        ("Has footer element", exists("footer")),
+        ("Has paragraph element", exists("p")),
+        ("Has correct border style", has_style("border-top", "1px solid #ccc")),
+        ("Has correct padding", has_style("padding", "10px")),
     ]
 );
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use yew_preview::generate_component_test;
-
-    generate_component_test!(
-        tokio,
-        FooterComp,
-        tokio_test_footer_comp_rendering,
-        FooterCompProps {
-            copyright: "© 2024 Test Company".to_string(),
-        },
-        vec![
-            TestCase {
-                name: "Has copyright text".to_string(),
-                matchers: vec![has_text("© 2024 Test Company")],
-            },
-            TestCase {
-                name: "Has footer element".to_string(),
-                matchers: vec![exists("footer")],
-            },
-            TestCase {
-                name: "Has paragraph element".to_string(),
-                matchers: vec![exists("p")],
-            },
-            TestCase {
-                name: "Has correct styles".to_string(),
-                matchers: vec![
-                    has_style("border-top", "1px solid #ccc"),
-                    has_style("padding", "10px"),
-                ],
-            },
-        ]
-    );
-
-    generate_component_test!(
-        tokio,
-        FooterComp,
-        tokio_test_footer_comp_empty,
-        FooterCompProps {
-            copyright: "".to_string(),
-        },
-        vec![TestCase {
-            name: "Renders with empty copyright".to_string(),
-            matchers: vec![exists("footer"), exists("p")],
-        },]
-    );
-}

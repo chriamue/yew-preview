@@ -21,53 +21,45 @@ pub fn feature_card(props: &FeatureCardProps) -> Html {
 mod preview {
     use super::*;
     use yew_preview::prelude::*;
+    use yew_preview::test_utils::exists;
 
-    yew_preview::create_preview!(
-        FeatureCard,
-        FeatureCardProps {
+    yew_preview::create_preview_with_tests!(
+        component: FeatureCard,
+        default_props: FeatureCardProps {
             icon: AttrValue::from("🚀"),
             title: AttrValue::from("Fast Setup"),
             description: AttrValue::from("Add previews directly to your component files with minimal boilerplate."),
         },
-        (
-            "Macro-Powered",
-            FeatureCardProps {
-                icon: AttrValue::from("📦"),
-                title: AttrValue::from("Macro-Powered"),
-                description: AttrValue::from("Concise create_preview! macro syntax keeps your code clean and self-documenting."),
-            }
-        ),
-        (
-            "Feature-Gated",
-            FeatureCardProps {
-                icon: AttrValue::from("🎯"),
-                title: AttrValue::from("Feature-Gated"),
-                description: AttrValue::from("Optional preview code compiled only with the yew-preview feature flag."),
-            }
-        ),
-        (
-            "Built-in Testing",
-            FeatureCardProps {
-                icon: AttrValue::from("🧪"),
-                title: AttrValue::from("Built-in Testing"),
-                description: AttrValue::from("Validate component states with integrated matchers via create_preview_with_tests!."),
-            }
-        ),
-        (
-            "Interactive UI",
-            FeatureCardProps {
-                icon: AttrValue::from("📱"),
-                title: AttrValue::from("Interactive UI"),
-                description: AttrValue::from("Browse all component variants and states live in an interactive sidebar UI."),
-            }
-        ),
-        (
-            "Quick Iteration",
-            FeatureCardProps {
-                icon: AttrValue::from("🔄"),
-                title: AttrValue::from("Quick Iteration"),
-                description: AttrValue::from("See changes instantly with Trunk hot reload during development."),
-            }
-        )
+        variants: [
+            (
+                "Macro-Powered",
+                FeatureCardProps {
+                    icon: AttrValue::from("📦"),
+                    title: AttrValue::from("Macro-Powered"),
+                    description: AttrValue::from("Concise create_preview! macro syntax keeps your code clean and self-documenting."),
+                }
+            ),
+            (
+                "Built-in Testing",
+                FeatureCardProps {
+                    icon: AttrValue::from("🧪"),
+                    title: AttrValue::from("Built-in Testing"),
+                    description: AttrValue::from("Validate component states with integrated matchers via create_preview_with_tests!."),
+                }
+            ),
+            (
+                "Interactive UI",
+                FeatureCardProps {
+                    icon: AttrValue::from("📱"),
+                    title: AttrValue::from("Interactive UI"),
+                    description: AttrValue::from("Browse all component variants and states live in an interactive sidebar UI."),
+                }
+            ),
+        ],
+        tests: [
+            ("Has card container", exists("div")),
+            ("Has title element", exists("h3")),
+            ("Has description element", exists("p")),
+        ]
     );
 }

@@ -89,6 +89,7 @@ impl Preview for PropShowcase {
                 render_fn,
             }),
             test_cases: vec![],
+            ssr_runner: None,
         }
     }
 }

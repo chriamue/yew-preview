@@ -28,26 +28,41 @@ pub fn code_snippet(props: &CodeSnippetProps) -> Html {
 mod preview {
     use super::*;
     use yew_preview::prelude::*;
+    use yew_preview::test_utils::exists;
 
-    yew_preview::create_preview!(
-        CodeSnippet,
-        CodeSnippetProps {
+    yew_preview::create_preview_with_tests!(
+        component: CodeSnippet,
+        default_props: CodeSnippetProps {
             label: AttrValue::from("Cargo.toml"),
             code: AttrValue::from("[dependencies]\nyew-preview = { git = \"https://github.com/chriamue/yew-preview\" }"),
         },
-        (
-            "create_preview! macro",
-            CodeSnippetProps {
-                label: AttrValue::from("component.rs"),
-                code: AttrValue::from("yew_preview::create_preview!(\n    MyComp,\n    MyCompProps { text: AttrValue::from(\"Default\") },\n    (\"Variant\", MyCompProps { text: AttrValue::from(\"Hello!\") }),\n);"),
-            }
-        ),
-        (
-            "Component group",
-            CodeSnippetProps {
-                label: AttrValue::from("main.rs"),
-                code: AttrValue::from("let groups = vec![\n    create_component_group!(\"UI\", MyComp),\n];\nhtml! { <PreviewPage groups={groups} /> }"),
-            }
-        )
+        variants: [
+            (
+                "create_preview! macro",
+                CodeSnippetProps {
+                    label: AttrValue::from("component.rs"),
+                    code: AttrValue::from("yew_preview::create_preview!(\n    MyComp,\n    MyCompProps { text: AttrValue::from(\"Default\") },\n    (\"Variant\", MyCompProps { text: AttrValue::from(\"Hello!\") }),\n);"),
+                }
+            ),
+            (
+                "Component group",
+                CodeSnippetProps {
+                    label: AttrValue::from("main.rs"),
+                    code: AttrValue::from("let groups = vec![\n    create_component_group!(\"UI\", MyComp),\n];\nhtml! { <PreviewPage groups={groups} /> }"),
+                }
+            ),
+            (
+                "No label",
+                CodeSnippetProps {
+                    label: AttrValue::from(""),
+                    code: AttrValue::from("fn main() { println!(\"hello\"); }"),
+                }
+            ),
+        ],
+        tests: [
+            ("Has pre element", exists("pre")),
+            ("Has code element", exists("code")),
+            ("Has wrapper element", exists("div")),
+        ]
     );
 }

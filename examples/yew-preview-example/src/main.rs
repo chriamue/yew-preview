@@ -6,8 +6,8 @@ mod components;
 mod pages;
 
 use components::{
-    badge::Badge, code_snippet::CodeSnippet, feature_card::FeatureCard, footer::FooterComp,
-    header::HeaderComp, image::ImageComp, project::ProjectComp,
+    badge::Badge, button::Button, code_snippet::CodeSnippet, feature_card::FeatureCard,
+    footer::FooterComp, header::HeaderComp, image::ImageComp, project::ProjectComp,
     prop_showcase::PropShowcase,
 };
 use pages::{
@@ -15,9 +15,8 @@ use pages::{
     interactive_page::InteractivePage, welcome_page::WelcomePage,
 };
 
-#[function_component(App)]
-pub fn app() -> Html {
-    let groups: ComponentList = vec![
+fn get_groups() -> ComponentList {
+    vec![
         create_component_group!(
             "Overview",
             WelcomePage::preview(),
@@ -34,12 +33,18 @@ pub fn app() -> Html {
             "Example Components",
             PropShowcase::preview(),
             Badge::preview(),
+            Button::preview(),
             HeaderComp::preview(),
             FooterComp::preview(),
             ImageComp::preview(),
             ProjectComp::preview()
         ),
-    ];
+    ]
+}
+
+#[function_component(App)]
+pub fn app() -> Html {
+    let groups: ComponentList = get_groups();
 
     html! {
         <div style="font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
@@ -56,4 +61,15 @@ pub fn app() -> Html {
 
 fn main() {
     yew::Renderer::<App>::new().render();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::get_groups;
+    use yew_preview::test_utils::run_groups_tests;
+
+    #[tokio::test]
+    async fn test_all_components() {
+        run_groups_tests(&get_groups()).await;
+    }
 }

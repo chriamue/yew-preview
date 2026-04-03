@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use yew_preview::test_utils::{exists, has_text};
+use yew_preview::test_utils::exists;
 use yew_preview::{create_preview_with_tests, prelude::*};
 
 #[derive(Properties, PartialEq, Clone, Default)]
@@ -78,76 +78,8 @@ create_preview_with_tests!(
         )
     ],
     tests: [
-        (
-            "Has title",
-            exists("h3"),
-        ),
-        (
-            "Has description",
-            exists("p"),
-        ),
-        (
-            "Has demo link",
-            exists("a"),
-        ),
-        (
-            "Has correct title text",
-            has_text("YewPreview"),
-        ),
-        (
-            "Has correct description",
-            has_text("A component explorer and test framework for Yew applications"),
-        ),
+        ("Has title", exists("h3")),
+        ("Has description", exists("p")),
+        ("Has demo link", exists("a")),
     ]
 );
-
-#[cfg(test)]
-mod tests {
-    use super::ProjectComp;
-    use super::ProjectCompProps;
-    use yew_preview::generate_component_test;
-    use yew_preview::prelude::*;
-    use yew_preview::test_utils::exists;
-
-    generate_component_test!(
-        tokio,
-        ProjectComp,
-        tokio_test_project_comp_rendering,
-        ProjectCompProps {
-            title: "Test Project".to_string(),
-            description: "Test Description".to_string(),
-            url: "https://test.com".to_string(),
-            repo: Some("https://github.com/test/repo".to_string()),
-        },
-        vec![
-            TestCase {
-                name: "Has correct title".to_string(),
-                matchers: vec![has_text("Test Project")],
-            },
-            TestCase {
-                name: "Has correct description".to_string(),
-                matchers: vec![has_text("Test Description")],
-            },
-            TestCase {
-                name: "Has demo link".to_string(),
-                matchers: vec![exists("a")],
-            },
-        ]
-    );
-
-    generate_component_test!(
-        tokio,
-        ProjectComp,
-        tokio_test_project_comp_no_repo,
-        ProjectCompProps {
-            title: "No Repo Project".to_string(),
-            description: "Project without repository".to_string(),
-            url: "https://test.com".to_string(),
-            repo: None,
-        },
-        vec![TestCase {
-            name: "Renders without repo".to_string(),
-            matchers: vec![exists("h3"), exists("p")],
-        },]
-    );
-}

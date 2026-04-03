@@ -1,7 +1,6 @@
 # YewPreview
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/chriamue/yew-preview/workflows/CI/badge.svg)](https://github.com/chriamue/yew-preview/actions/workflows/ci.yml)
 [![Deploy](https://github.com/chriamue/yew-preview/workflows/GitHub%20Pages%20Deployment/badge.svg)](https://github.com/chriamue/yew-preview/actions/workflows/gh-pages.yml)
 
 **YewPreview** is a lightweight Rust library for quickly generating interactive component previews in Yew applications. Add preview variants directly to your components with minimal boilerplate.
@@ -122,6 +121,19 @@ Open `http://localhost:8080` to browse your previews.
 3. **Use `create_preview!` macro** to register preview states
 4. **Build with feature flag** to generate preview UI
 5. **Iterate quickly** with Trunk hot reload
+
+## Documentation
+
+Full Obsidian-style notes live in [`docs/`](docs/):
+
+| Note | Contents |
+|---|---|
+| [Getting Started](docs/getting-started.md) | Install, first preview, run |
+| [Macros Reference](docs/macros.md) | `create_preview!`, `create_component_group!`, `generate_component_test!` |
+| [UI Components](docs/components.md) | `PreviewPage`, `Sidebar`, `ConfigPanel`, data types |
+| [Testing](docs/testing.md) | Matchers, `TestCase`, `render_component` |
+| [Architecture](docs/architecture.md) | Crate layout, feature flags, design decisions |
+| [Examples](docs/examples.md) | Annotated walkthrough of the bundled example |
 
 ## Projects Using YewPreview
 

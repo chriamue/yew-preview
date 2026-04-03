@@ -13,6 +13,11 @@ mod search_bar;
 mod search_results;
 pub mod test_utils;
 
+#[cfg(feature = "serve")]
+mod server;
+#[cfg(feature = "serve")]
+pub use server::serve_blocking;
+
 pub mod prelude {
     // Core types
     pub use crate::component_group::ComponentGroup;

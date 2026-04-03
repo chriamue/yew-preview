@@ -11,11 +11,16 @@ repository.workspace = true
 default = []
 testing = ["yew/ssr"]
 tests-ignored = []
+serve = ["dep:axum", "dep:tokio", "dep:tower-http", "dep:serde", "yew/ssr"]
 
 [dependencies]
 yew = { workspace = true }
 paste = "1.0"
 web-sys = { version = "0.3", features = ["HtmlElement", "HtmlInputElement"] }
+axum = { version = "0.8", optional = true }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"], optional = true }
+tower-http = { version = "0.6", features = ["cors"], optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
 
 [dev-dependencies]
 tokio = { version = "1.0", features = ["macros"] }

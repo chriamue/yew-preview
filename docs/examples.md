@@ -80,10 +80,10 @@ graph TD
     CL[ComponentList] --> G1[Layout Components]
     CL --> G2[Media Components]
     CL --> G3[Projects]
-    G1 --> H[HeaderComp\nDefault / Hello / Goodbye]
+    G1 --> H["HeaderComp\nDefault / Hello / Goodbye"]
     G1 --> F[FooterComp]
-    G2 --> I[ImageComp\nsrc + alt]
-    G3 --> P[ProjectComp\nYewPreview / Konnektoren\nNo Repo / Long Desc]
+    G2 --> I["ImageComp\nsrc + alt"]
+    G3 --> P["ProjectComp\nYewPreview / Konnektoren\nNo Repo / Long Desc"]
 ```
 
 This produces a three-group sidebar. Expanding each group shows the component list.

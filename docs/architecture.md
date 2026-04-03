@@ -11,13 +11,13 @@ tags: [architecture, internals, design]
 
 ```mermaid
 graph TD
-    WS[Workspace root] --> LC[crates/yew-preview\nlibrary crate]
-    WS --> EX[examples/yew-preview-example\ntrunk WASM app]
-    LC --> LIB[lib.rs\npublic re-exports]
+    WS[Workspace root] --> LC["crates/yew-preview\nlibrary crate"]
+    WS --> EX["examples/yew-preview-example\ntrunk WASM app"]
+    LC --> LIB["lib.rs\npublic re-exports"]
     LC --> MAC[macros.rs]
-    LC --> PRV[preview.rs\nComponentItem/Group/List]
-    LC --> UI[UI Components\npreview_page sidebar etc]
-    LC --> TU[test_utils/\nfeature: testing]
+    LC --> PRV["preview.rs\nComponentItem/Group/List"]
+    LC --> UI["UI Components\npreview_page sidebar etc"]
+    LC --> TU["test_utils/\nfeature: testing"]
 ```
 
 ```
@@ -58,14 +58,14 @@ yew-preview/                  ← workspace root
 ```mermaid
 graph LR
     subgraph no-feature [default build]
-        DT[ComponentItem\nComponentGroup\nComponentList]
-        UI[PreviewPage\nSidebar etc]
+        DT["ComponentItem\nComponentGroup\nComponentList"]
+        UI["PreviewPage\nSidebar etc"]
     end
     subgraph yew-preview-feature [feature = yew-preview]
-        MAC[create_preview!\ncreate_component_group!]
+        MAC["create_preview!\ncreate_component_group!"]
     end
     subgraph testing-feature [feature = testing]
-        TU[test_utils\nrender_component\nMatcher / TestCase]
+        TU["test_utils\nrender_component\nMatcher / TestCase"]
         GCT[generate_component_test!]
     end
     MAC --> DT
@@ -76,12 +76,12 @@ graph LR
 
 ```mermaid
 flowchart TD
-    DEV[Developer defines component] --> CP[create_preview!\nComp + DefaultProps + variants]
-    CP --> CI["Comp::preview()\n→ ComponentItem"]
-    CI --> CCG["create_component_group!\n(Label, Comp, ...)"]
-    CCG --> CG["ComponentGroup\n{ name, components }"]
-    CG --> CL["vec![group1, group2]\n→ ComponentList"]
-    CL --> PP["&lt;PreviewPage groups={...} /&gt;"]
+    DEV[Developer defines component] --> CP["create_preview!\nComp + DefaultProps + variants"]
+    CP --> CI["Comp::preview()\n-> ComponentItem"]
+    CI --> CCG["create_component_group!\nLabel, Comp, ..."]
+    CCG --> CG["ComponentGroup\nname + components"]
+    CG --> CL["Vec of ComponentGroup\n-> ComponentList"]
+    CL --> PP["PreviewPage groups={...}"]
 ```
 
 ## State Management in `PreviewPage`

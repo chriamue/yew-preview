@@ -89,11 +89,11 @@ Open `http://localhost:8080`. The sidebar lists your groups and components; clic
 
 ```mermaid
 flowchart TD
-    A[Define component\n#[function_component]] --> B[Add preview module\n#[cfg feature=yew-preview]]
-    B --> C[create_preview! macro\ndefault + variants]
-    C --> D[Assemble groups\ncreate_component_group!]
-    D --> E[Render PreviewPage\nin main.rs]
-    E --> F[trunk serve\nlocalhost:8080]
+    A["Define component\n#[function_component]"] --> B["Add preview module\n#[cfg feature=yew-preview]"]
+    B --> C["create_preview! macro\ndefault + variants"]
+    C --> D["Assemble groups\ncreate_component_group!"]
+    D --> E["Render PreviewPage\nin main.rs"]
+    E --> F["trunk serve\nlocalhost:8080"]
     F --> G{Iterate}
     G -->|edit props| C
     G -->|add component| B

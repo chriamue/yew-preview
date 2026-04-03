@@ -15,8 +15,8 @@ YewPreview ships built-in test utilities behind the `testing` feature flag. They
 flowchart TD
     GCT[generate_component_test!] -->|expands to| TF[async test fn]
     TF --> RC[render_component C props .await]
-    RC --> LSR[LocalServerRenderer\nSSR → HTML string]
-    LSR --> MR[run TestCase.matches html]
+    RC --> LSR["LocalServerRenderer\nSSR to HTML string"]
+    LSR --> MR["run TestCase.matches html"]
     MR --> MA{all matchers pass?}
     MA -->|yes| PASS[test passes]
     MA -->|no| FAIL[panic with failing matcher]

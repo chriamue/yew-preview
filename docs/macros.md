@@ -13,14 +13,14 @@ YewPreview is macro-driven. All macros live in `crates/yew-preview/src/macros.rs
 
 ```mermaid
 flowchart TD
-    CP[create_preview!] -->|generates| PI[Comp::preview\n→ ComponentItem]
+    CP[create_preview!] -->|generates| PI["Comp::preview\n-> ComponentItem"]
     CPT[create_preview_with_tests!] -->|extends| CP
     CPT -->|attaches| TC[TestCase list]
     PI -->|consumed by| CCG[create_component_group!]
     CCG -->|returns| CG[ComponentGroup]
     CCI[create_component_item!] -.->|low-level alternative| PI
     GCT[generate_component_test!] -->|reads| TC
-    GCT -->|produces| TF[#[tokio::test] fn]
+    GCT -->|produces| TF["#[tokio::test] fn"]
 ```
 
 ## `create_preview!`

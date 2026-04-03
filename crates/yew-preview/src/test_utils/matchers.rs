@@ -10,6 +10,18 @@ pub enum Matcher {
 }
 
 impl Matcher {
+    pub fn description(&self) -> String {
+        match self {
+            Matcher::Contains(s) => format!("contains {:?}", s),
+            Matcher::HasAttribute(attr, val) => format!("has attribute {}={:?}", attr, val),
+            Matcher::HasClass(cls) => format!("has class {:?}", cls),
+            Matcher::HasStyle(prop, val) => format!("has style {}: {}", prop, val),
+            Matcher::HasText(t) => format!("has text {:?}", t),
+            Matcher::Exists(sel) => format!("has <{}> element", sel),
+            Matcher::ElementCount(sel, n) => format!("has {} <{}> element(s)", n, sel),
+        }
+    }
+
     pub fn matches(&self, html: &str) -> bool {
         match self {
             Matcher::Contains(text) => html.contains(text),

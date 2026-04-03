@@ -1,4 +1,5 @@
 use crate::interactive::ArgValue;
+use crate::test_utils::TestCaseResult;
 use web_sys::wasm_bindgen::JsCast;
 use yew::prelude::*;
 
@@ -9,6 +10,7 @@ pub struct ConfigPanelProps {
     pub selected: Option<String>,
     pub live_args: Option<Vec<(String, ArgValue)>>,
     pub on_arg_change: Callback<(String, ArgValue)>,
+    pub test_results: Vec<TestCaseResult>,
 }
 
 #[function_component(ConfigPanel)]
@@ -200,6 +202,8 @@ pub fn config_panel(props: &ConfigPanelProps) -> Html {
         html! {}
     };
 
+    let test_panel = render_test_panel(&props.test_results);
+
     html! {
         <div>
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
@@ -208,6 +212,71 @@ pub fn config_panel(props: &ConfigPanelProps) -> Html {
                 { interactive_button }
             </div>
             { arg_controls }
+            { test_panel }
+        </div>
+    }
+}
+
+fn render_test_panel(results: &[TestCaseResult]) -> Html {
+    if results.is_empty() {
+        return html! {};
+    }
+
+    let total = results.len();
+    let passing = results.iter().filter(|r| r.passed).count();
+    let all_pass = passing == total;
+
+    let summary_color = if all_pass { "#1a7f37" } else { "#cf222e" };
+    let summary_bg = if all_pass { "#dafbe1" } else { "#ffebe9" };
+    let summary_icon = if all_pass { "✓" } else { "✗" };
+
+    let rows = results.iter().map(|tc| {
+        let icon = if tc.passed { "✓" } else { "✗" };
+        let color = if tc.passed { "#1a7f37" } else { "#cf222e" };
+
+        let matcher_detail = if !tc.passed {
+            let details = tc.matchers.iter().map(|m| {
+                let m_icon = if m.passed { "✓" } else { "✗" };
+                let m_color = if m.passed { "#1a7f37" } else { "#cf222e" };
+                html! {
+                    <div style={format!("padding: 2px 0 2px 20px; font-size: 0.78rem; color: {};", m_color)}>
+                        { format!("{} {}", m_icon, m.description) }
+                    </div>
+                }
+            });
+            html! { <div style="margin-top: 2px;">{ for details }</div> }
+        } else {
+            html! {}
+        };
+
+        html! {
+            <div style="padding: 5px 0; border-bottom: 1px solid #f0f0f0;">
+                <div style={format!("font-size: 0.82rem; color: {}; font-weight: 500;", color)}>
+                    { format!("{} {}", icon, tc.name) }
+                </div>
+                { matcher_detail }
+            </div>
+        }
+    });
+
+    html! {
+        <div style="margin-top: 10px; border-top: 1px solid #e1e4e8; padding-top: 10px;">
+            <div style={format!(
+                "display: flex; align-items: center; justify-content: space-between; \
+                 padding: 5px 10px; border-radius: 4px 4px 0 0; \
+                 background: {}; border: 1px solid {}44;",
+                summary_bg, summary_color
+            )}>
+                <span style={format!("font-size: 0.78rem; font-weight: 700; color: {};", summary_color)}>
+                    { format!("{} Tests", summary_icon) }
+                </span>
+                <span style={format!("font-size: 0.78rem; color: {};", summary_color)}>
+                    { format!("{}/{} passing", passing, total) }
+                </span>
+            </div>
+            <div style="border: 1px solid #e1e4e8; border-top: none; border-radius: 0 0 4px 4px; padding: 4px 10px; background: #fff;">
+                { for rows }
+            </div>
         </div>
     }
 }

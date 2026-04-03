@@ -28,7 +28,9 @@ pub mod prelude {
 
     // Test types (data structures, always available)
     pub use crate::test_utils::helpers::*;
+    pub use crate::test_utils::MatcherResult;
     pub use crate::test_utils::Matcher;
     pub use crate::test_utils::TestCase;
+    pub use crate::test_utils::TestCaseResult;
     pub use crate::test_utils::TestCases;
 }

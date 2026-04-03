@@ -14,7 +14,7 @@ testing = ["yew/ssr"]
 [dependencies]
 yew = { workspace = true }
 paste = "1.0"
-web-sys = { version = "0.3", features = ["HtmlInputElement"] }
+web-sys = { version = "0.3", features = ["HtmlElement", "HtmlInputElement"] }
 
 [dev-dependencies]
 tokio = { version = "1.0", features = ["macros"] }

@@ -6,6 +6,7 @@ use crate::group_selector::GroupSelector;
 use crate::interactive::ArgValue;
 use crate::search_bar::SearchBar;
 use crate::search_results::SearchResults;
+use crate::test_utils::TestCaseResult;
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
@@ -28,6 +29,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
     let is_sidebar_visible = use_state(|| true);
     let search_query = use_state(String::new);
     let live_args = use_state(Vec::<(String, ArgValue)>::new);
+    let test_results = use_state(Vec::<TestCaseResult>::new);
 
     let on_search = {
         let search_query = search_query.clone();
@@ -49,13 +51,14 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
         let selected = selected_component.clone();
         let selected_property = selected_property.clone();
         let live_args = live_args.clone();
+        let test_results = test_results.clone();
         Callback::from(move |comp_index| {
             if let Some(group_index) = *selected_group {
                 selected.set(Some(SelectedComponent {
                     group_index,
                     component_index: comp_index,
                 }));
-
+                test_results.set(vec![]);
                 let component = &groups[group_index].components[comp_index];
                 if let Some(args) = &component.args {
                     live_args.set(args.values.clone());
@@ -115,6 +118,13 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                 entry.1 = val;
             }
             live_args.set(updated);
+        })
+    };
+
+    let on_test_results = {
+        let test_results = test_results.clone();
+        Callback::from(move |results: Vec<TestCaseResult>| {
+            test_results.set(results);
         })
     };
 
@@ -262,6 +272,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                             item={current_component}
                             selected_property={(*selected_property).clone()}
                             live_args={(*live_args).clone()}
+                            on_test_results={on_test_results}
                         />
                     </div>
                 </div>
@@ -277,6 +288,7 @@ pub fn preview_page(props: &PreviewPageProps) -> Html {
                         on_select={on_property_select}
                         live_args={if is_interactive { Some((*live_args).clone()) } else { None }}
                         on_arg_change={on_arg_change}
+                        test_results={(*test_results).clone()}
                     />
                 </div>
             </div>

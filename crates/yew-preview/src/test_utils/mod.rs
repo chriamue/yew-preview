@@ -4,7 +4,7 @@ pub mod test_case;
 
 pub use helpers::*;
 pub use matchers::Matcher;
-pub use test_case::TestCase;
+pub use test_case::{MatcherResult, TestCase, TestCaseResult};
 
 #[cfg(feature = "testing")]
 use yew::{BaseComponent, Properties};

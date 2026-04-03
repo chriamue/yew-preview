@@ -114,7 +114,38 @@ trunk serve
 
 Open `http://localhost:8080` to browse your previews.
 
-### 5. Integration Test for All Components
+### 5. Native Preview Server (no trunk)
+
+Add `examples/serve.rs` to your project for a zero-dependency preview server:
+
+```toml
+# Cargo.toml — serve feature only in dev-dependencies, never in the WASM build
+[lib]
+name = "my_components"
+path = "src/lib.rs"
+
+[dev-dependencies]
+yew-preview = { ..., features = ["testing", "serve"] }
+```
+
+```rust
+// src/lib.rs
+pub fn preview_groups() -> ComponentList { ... }
+
+// examples/serve.rs
+fn main() {
+    yew_preview::serve_blocking(my_components::preview_groups(), 8080);
+}
+```
+
+```bash
+cargo run --example serve
+# yew-preview: http://localhost:8080
+```
+
+All HTML is generated via Yew SSR at startup — no files, no WASM, no trunk required.
+
+### 6. Integration Test for All Components
 
 Call `run_groups_tests` from a single `#[tokio::test]` to run every component's SSR tests at once:
 
@@ -185,6 +216,7 @@ Full notes live in [`docs/`](docs/):
 | [Macros Reference](docs/macros.md) | All macros |
 | [UI Components](docs/components.md) | `PreviewPage`, `ConfigPanel`, data types, state flow |
 | [Testing](docs/testing.md) | Matchers, `TestCase`, `render_component`, `tests-ignored` |
+| [Native Server](docs/serve.md) | `serve_blocking`, axum SSR server, `examples/serve.rs` pattern |
 | [Architecture](docs/architecture.md) | Crate layout, feature flags, design decisions |
 | [Examples](docs/examples.md) | Annotated walkthrough of the bundled example |
 

@@ -12,7 +12,7 @@ default = []
 testing = ["yew/ssr"]
 
 [dependencies]
-yew = { version = "0.21" }
+yew = { workspace = true }
 paste = "1.0"
 web-sys = { version = "0.3", features = ["HtmlInputElement"] }
 

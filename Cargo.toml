@@ -11,3 +11,6 @@ edition = "2021"
 authors = ["chriamue"]
 license = "MIT"
 repository = "https://github.com/chriamue/yew-preview"
+
+[workspace.dependencies]
+yew = { version = "0.23" }

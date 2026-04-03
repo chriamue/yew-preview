@@ -1,7 +1,6 @@
 [build]
 target = "index.html"
 dist = "dist"
-example = "preview"
 
 [watch]
 ignore = ["target"]

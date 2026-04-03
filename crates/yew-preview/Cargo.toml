@@ -1,0 +1,20 @@
+[package]
+name = "yew-preview"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "A lightweight Rust library for quickly generating interactive component previews in Yew applications."
+license.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+testing = ["yew/ssr"]
+
+[dependencies]
+yew = { version = "0.21" }
+paste = "1.0"
+web-sys = { version = "0.3", features = ["HtmlInputElement"] }
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["macros"] }

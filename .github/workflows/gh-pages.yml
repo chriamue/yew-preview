@@ -59,7 +59,8 @@ jobs:
         with:
           version: latest
 
-      - run: trunk build --release --dist ./dist --public-url ${{ env.PUBLIC_URL }}
+      - run: trunk build --release --dist ../../dist --public-url ${{ env.PUBLIC_URL }}
+        working-directory: examples/yew-preview-example
 
       - uses: actions/upload-artifact@v4
         with:

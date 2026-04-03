@@ -100,6 +100,7 @@ macro_rules! create_preview_with_tests {
     };
 }
 
+#[cfg(feature = "testing")]
 #[macro_export]
 macro_rules! generate_component_test {
     // With explicit test name

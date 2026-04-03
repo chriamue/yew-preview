@@ -1,0 +1,14 @@
+[package]
+name = "yew-preview-example"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+yew = { version = "0.21", features = ["csr"] }
+yew-preview = { path = "../../crates/yew-preview" }
+paste = "1.0"
+web-sys = { version = "0.3", features = ["HtmlInputElement"] }

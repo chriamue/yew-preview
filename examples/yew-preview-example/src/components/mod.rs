@@ -1,5 +1,6 @@
 pub mod badge;
 pub mod button;
+pub mod card;
 pub mod prop_showcase;
 pub mod code_snippet;
 pub mod feature_card;

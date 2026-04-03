@@ -6,9 +6,9 @@ mod components;
 mod pages;
 
 use components::{
-    badge::Badge, button::Button, code_snippet::CodeSnippet, feature_card::FeatureCard,
-    footer::FooterComp, header::HeaderComp, image::ImageComp, project::ProjectComp,
-    prop_showcase::PropShowcase,
+    badge::Badge, button::Button, card::CardComp, code_snippet::CodeSnippet,
+    feature_card::FeatureCard, footer::FooterComp, header::HeaderComp, image::ImageComp,
+    project::ProjectComp, prop_showcase::PropShowcase,
 };
 use pages::{
     doc_page::DocPage, getting_started_page::GettingStartedPage,
@@ -38,6 +38,10 @@ fn get_groups() -> ComponentList {
             FooterComp::preview(),
             ImageComp::preview(),
             ProjectComp::preview()
+        ),
+        create_component_group!(
+            "Failing Tests Demo",
+            CardComp::preview()
         ),
     ]
 }

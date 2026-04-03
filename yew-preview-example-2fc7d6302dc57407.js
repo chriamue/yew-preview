@@ -300,13 +300,13 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
         __wbindgen_cast_0000000000000001: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 645, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 497, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
             const ret = makeMutClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__ha97b474af06e9d2e);
             return ret;
         },
         __wbindgen_cast_0000000000000002: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Ref(NamedExternref("Event"))], shim_idx: 605, ret: Unit, inner_ret: Some(Unit) }, mutable: false }) -> Externref`.
-            const ret = makeClosure(arg0, arg1, wasm_bindgen__convert__closures________invoke__h0d2defc17541b95a);
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Ref(NamedExternref("Event"))], shim_idx: 438, ret: Unit, inner_ret: Some(Unit) }, mutable: false }) -> Externref`.
+            const ret = makeClosure(arg0, arg1, wasm_bindgen__convert__closures________invoke__h56a37534d4826288);
             return ret;
         },
         __wbindgen_cast_0000000000000003: function(arg0, arg1) {
@@ -326,12 +326,12 @@ function __wbg_get_imports() {
     };
     return {
         __proto__: null,
-        "./yew-preview_bg.js": import0,
+        "./yew-preview-example_bg.js": import0,
     };
 }
 
-function wasm_bindgen__convert__closures________invoke__h0d2defc17541b95a(arg0, arg1, arg2) {
-    wasm.wasm_bindgen__convert__closures________invoke__h0d2defc17541b95a(arg0, arg1, arg2);
+function wasm_bindgen__convert__closures________invoke__h56a37534d4826288(arg0, arg1, arg2) {
+    wasm.wasm_bindgen__convert__closures________invoke__h56a37534d4826288(arg0, arg1, arg2);
 }
 
 function wasm_bindgen__convert__closures_____invoke__ha97b474af06e9d2e(arg0, arg1, arg2) {
@@ -674,7 +674,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (module_or_path === undefined) {
-        module_or_path = new URL('yew-preview_bg.wasm', import.meta.url);
+        module_or_path = new URL('yew-preview-example_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 

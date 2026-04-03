@@ -12,6 +12,7 @@ macro_rules! create_component_item {
                 .collect(),
             args: None,
             test_cases: Vec::new(),
+            ssr_runner: None,
         }
     };
 }
@@ -50,6 +51,7 @@ macro_rules! create_preview {
                     render,
                     args: None,
                     test_cases: Vec::new(),
+                    ssr_runner: None,
                 }
             }
         }
@@ -96,7 +98,64 @@ macro_rules! create_preview_with_tests {
                     name: stringify!($component).to_string(),
                     render,
                     args: None,
-                    test_cases,
+                    test_cases: test_cases.clone(),
+                    ssr_runner: {
+                        Some(std::rc::Rc::new(move || {
+                            let variants: Vec<(String, <$component as ::yew::BaseComponent>::Properties)> = vec![
+                                ("Default".to_string(), $default_props),
+                                $(($prop_name.to_string(), $props),)*
+                            ];
+                            let tcs = test_cases.clone();
+                            Box::pin(async move {
+                                for (variant_name, props) in variants {
+                                    let html =
+                                        $crate::test_utils::render_component::<$component>(props)
+                                            .await;
+                                    for tc in &tcs {
+                                        let result = tc.run(&html);
+                                        if result.passed {
+                                            println!(
+                                                "  [{}] [{}] ✓ {}",
+                                                stringify!($component),
+                                                variant_name,
+                                                result.name
+                                            );
+                                        } else {
+                                            let failures = result
+                                                .matchers
+                                                .iter()
+                                                .filter(|m| !m.passed)
+                                                .map(|m| format!("    ✗ {}", m.description))
+                                                .collect::<Vec<_>>()
+                                                .join("\n");
+                                            panic!(
+                                                "[{}] [{}] Test '{}' failed:\n{}",
+                                                stringify!($component),
+                                                variant_name,
+                                                result.name,
+                                                failures
+                                            );
+                                        }
+                                    }
+                                }
+                            })
+                        }))
+                    },
+                }
+            }
+        }
+
+        // Generate a test module per component with one test per variant.
+        // Module name groups the tests: `{component}_preview::default`, `::hello`, etc.
+        #[cfg(test)]
+        paste::paste! {
+            mod [<$component:snake _preview>] {
+                #[tokio::test]
+                async fn default() {
+                    let item = <super::$component as $crate::prelude::Preview>::preview();
+                    if let Some(runner) = &item.ssr_runner {
+                        runner().await;
+                    }
                 }
             }
         }
@@ -118,7 +177,6 @@ macro_rules! create_interactive_preview {
                 ];
                 let render_fn: Rc<dyn Fn(&[(String, $crate::interactive::ArgValue)]) -> ::yew::Html> =
                     Rc::new($render_fn);
-                let default_html = render_fn(&initial_args);
                 ComponentItem {
                     name: stringify!($component).to_string(),
                     render: vec![],
@@ -127,6 +185,7 @@ macro_rules! create_interactive_preview {
                         render_fn,
                     }),
                     test_cases: Vec::new(),
+                    ssr_runner: None,
                 }
             }
         }
@@ -143,11 +202,15 @@ macro_rules! generate_component_test {
             let html = $crate::test_utils::render_component::<$component>($props).await;
 
             for test_case in $test_cases {
-                assert!(
-                    test_case.matches(&html),
-                    "Test case '{}' failed",
-                    test_case.name
-                );
+                let result = test_case.run(&html);
+                if !result.passed {
+                    let failures = result.matchers.iter()
+                        .filter(|m| !m.passed)
+                        .map(|m| format!("  ✗ {}", m.description))
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    panic!("Test '{}' failed:\n{}", result.name, failures);
+                }
             }
         }
     };
@@ -159,11 +222,15 @@ macro_rules! generate_component_test {
                 let html = $crate::test_utils::render_component::<$component>($props).await;
 
                 for test_case in $test_cases {
-                    assert!(
-                        test_case.matches(&html),
-                        "Test case '{}' failed",
-                        test_case.name
-                    );
+                    let result = test_case.run(&html);
+                    if !result.passed {
+                        let failures = result.matchers.iter()
+                            .filter(|m| !m.passed)
+                            .map(|m| format!("  ✗ {}", m.description))
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        panic!("Test '{}' failed:\n{}", result.name, failures);
+                    }
                 }
             }
         }
@@ -175,11 +242,15 @@ macro_rules! generate_component_test {
             let html = $crate::test_utils::render_component::<$component>($props).await;
 
             for test_case in $test_cases {
-                assert!(
-                    test_case.matches(&html),
-                    "Test case '{}' failed",
-                    test_case.name
-                );
+                let result = test_case.run(&html);
+                if !result.passed {
+                    let failures = result.matchers.iter()
+                        .filter(|m| !m.passed)
+                        .map(|m| format!("  ✗ {}", m.description))
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    panic!("Test '{}' failed:\n{}", result.name, failures);
+                }
             }
         }
     };
@@ -191,11 +262,15 @@ macro_rules! generate_component_test {
                 let html = $crate::test_utils::render_component::<$component>($props).await;
 
                 for test_case in $test_cases {
-                    assert!(
-                        test_case.matches(&html),
-                        "Test case '{}' failed",
-                        test_case.name
-                    );
+                    let result = test_case.run(&html);
+                    if !result.passed {
+                        let failures = result.matchers.iter()
+                            .filter(|m| !m.passed)
+                            .map(|m| format!("  ✗ {}", m.description))
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        panic!("Test '{}' failed:\n{}", result.name, failures);
+                    }
                 }
             }
         }

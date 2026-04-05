@@ -58,18 +58,21 @@ impl Preview for PropShowcase {
         use yew::html;
 
         let initial_args: Vec<(String, ArgValue)> = vec![
-            ("label".to_string(),   ArgValue::Text("My Component".to_string())),
+            (
+                "label".to_string(),
+                ArgValue::Text("My Component".to_string()),
+            ),
             ("enabled".to_string(), ArgValue::Bool(true)),
-            ("count".to_string(),   ArgValue::Int(42)),
-            ("size".to_string(),    ArgValue::IntRange(80, 1, 200)),
-            ("ratio".to_string(),   ArgValue::Float(0.8)),
+            ("count".to_string(), ArgValue::Int(42)),
+            ("size".to_string(), ArgValue::IntRange(80, 1, 200)),
+            ("ratio".to_string(), ArgValue::Float(0.8)),
         ];
         let render_fn: Rc<dyn Fn(&[(String, ArgValue)]) -> Html> = Rc::new(|args| {
-            let label   = get_text(args, "label");
+            let label = get_text(args, "label");
             let enabled = get_bool(args, "enabled");
-            let count   = get_int(args, "count");
-            let size    = get_int(args, "size");
-            let ratio   = get_float(args, "ratio");
+            let count = get_int(args, "count");
+            let size = get_int(args, "size");
+            let ratio = get_float(args, "ratio");
             html! {
                 <PropShowcase
                     label={label}

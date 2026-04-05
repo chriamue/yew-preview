@@ -10,7 +10,7 @@ use components::{
     project::ProjectComp, prop_showcase::PropShowcase,
 };
 use pages::{
-    doc_page::DocPage, getting_started_page::GettingStartedPage,
+    catalog_page::CatalogPage, doc_page::DocPage, getting_started_page::GettingStartedPage,
     interactive_page::InteractivePage, serve_page::ServePage, welcome_page::WelcomePage,
 };
 
@@ -25,6 +25,7 @@ pub fn preview_groups() -> ComponentList {
         ),
         create_component_group!("Documentation", DocPage::preview()),
         create_component_group!("Native Server", ServePage::preview()),
+        create_component_group!("Static Catalog", CatalogPage::preview()),
         create_component_group!(
             "Example Components",
             PropShowcase::preview(),

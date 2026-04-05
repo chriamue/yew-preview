@@ -26,10 +26,7 @@ pub fn doc_page(props: &DocPageProps) -> Html {
             state.set(LoadState::Loading);
             wasm_bindgen_futures::spawn_local(async move {
                 let result: Result<String, String> = async {
-                    let resp = Request::get(&src)
-                        .send()
-                        .await
-                        .map_err(|e| e.to_string())?;
+                    let resp = Request::get(&src).send().await.map_err(|e| e.to_string())?;
                     if !resp.ok() {
                         return Err(format!("HTTP {}", resp.status()));
                     }
@@ -128,10 +125,7 @@ mod preview {
     };
 
     fn raw_doc(file: &str) -> AttrValue {
-        let raw = SOURCE_URL.replace(
-            "https://github.com/",
-            "https://raw.githubusercontent.com/",
-        );
+        let raw = SOURCE_URL.replace("https://github.com/", "https://raw.githubusercontent.com/");
         AttrValue::from(format!("{}/main/docs/{}", raw, file))
     }
 

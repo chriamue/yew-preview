@@ -72,8 +72,5 @@ mod preview {
     use super::*;
     use yew_preview::prelude::*;
 
-    yew_preview::create_preview!(
-        GettingStartedPage,
-        GettingStartedPageProps {},
-    );
+    yew_preview::create_preview!(GettingStartedPage, GettingStartedPageProps {},);
 }

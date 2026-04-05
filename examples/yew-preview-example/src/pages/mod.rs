@@ -1,3 +1,4 @@
+pub mod catalog_page;
 pub mod doc_page;
 pub mod getting_started_page;
 pub mod interactive_page;

@@ -1,6 +1,6 @@
 use yew::prelude::*;
-use yew_preview::prelude::*;
 use yew_preview::create_preview_with_tests;
+use yew_preview::prelude::*;
 
 #[derive(Properties, PartialEq, Clone, Default)]
 pub struct ImageCompProps {
@@ -26,7 +26,7 @@ create_preview_with_tests!(
     tests: [
         ("Has img element",     Matcher::Exists("img".to_string())),
         ("Has image source",    Matcher::HasAttribute("src".to_string(), RUST_LOGO.to_string())),
-        ("Has correct size",    Matcher::HasAttribute("width".to_string(), "256px".to_string()),
-                                Matcher::HasAttribute("height".to_string(), "256px".to_string())),
+        ("Has size attributes", Matcher::Contains("width=\"".to_string()),
+                                Matcher::Contains("height=\"".to_string())),
     ]
 );

@@ -63,6 +63,11 @@ jobs:
       - run: trunk build --release --dist ../../dist --public-url ${{ env.PUBLIC_URL }}
         working-directory: examples/yew-preview-example
 
+      - name: Generate component catalog
+        run: cargo run -p yew-preview-example --example catalog
+        env:
+          OUTPUT: dist/catalog.html
+
       - uses: actions/upload-artifact@v4
         with:
           name: dist

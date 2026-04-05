@@ -1,3 +1,11 @@
+#[cfg(feature = "catalog")]
+mod render;
+
+#[cfg(feature = "catalog")]
+pub mod catalog;
+#[cfg(feature = "catalog")]
+pub use catalog::{CatalogOptions, generate_catalog_blocking};
+
 mod component_group;
 mod component_item;
 mod component_list;
@@ -17,6 +25,7 @@ pub mod test_utils;
 mod server;
 #[cfg(feature = "serve")]
 pub use server::serve_blocking;
+
 
 pub mod prelude {
     // Core types

@@ -1,78 +1,8 @@
 use crate::component_list::ComponentList;
+use crate::render::{prerender, esc, GroupData};
 use axum::{Router, extract::Query, routing::get};
 use serde::Deserialize;
 use std::sync::Arc;
-use yew::prelude::*;
-
-// ── SSR wrapper ───────────────────────────────────────────────────────────────
-
-#[derive(Properties, PartialEq, Clone)]
-struct VNodeProps {
-    node: Html,
-}
-
-#[function_component(VNodeRenderer)]
-fn vnode_renderer(props: &VNodeProps) -> Html {
-    props.node.clone()
-}
-
-async fn ssr(node: Html) -> String {
-    yew::LocalServerRenderer::<VNodeRenderer>::with_props(VNodeProps { node })
-        .render()
-        .await
-}
-
-// ── Send-safe pre-rendered data ───────────────────────────────────────────────
-
-struct VariantData {
-    name: String,
-    html: String,
-}
-
-struct TestData {
-    name: String,
-    matchers: Vec<String>,
-}
-
-struct ComponentData {
-    name: String,
-    variants: Vec<VariantData>,
-    tests: Vec<TestData>,
-    has_interactive: bool,
-}
-
-struct GroupData {
-    name: String,
-    components: Vec<ComponentData>,
-}
-
-/// Consumes `ComponentList` (not Send), renders every variant via Yew SSR,
-/// and returns plain `String` data that is `Send + Sync`.
-/// Must be called inside a `tokio::task::LocalSet`.
-async fn prerender(groups: ComponentList) -> Vec<GroupData> {
-    let mut result = Vec::new();
-    for group in groups {
-        let mut components = Vec::new();
-        for item in group.components {
-            let mut variants = Vec::new();
-            for (name, node) in item.render {
-                variants.push(VariantData { name, html: ssr(node).await });
-            }
-            let tests = item.test_cases.iter().map(|tc| TestData {
-                name: tc.name.clone(),
-                matchers: tc.matchers.iter().map(|m| format!("{m:?}")).collect(),
-            }).collect();
-            components.push(ComponentData {
-                name: item.name,
-                variants,
-                tests,
-                has_interactive: item.args.is_some(),
-            });
-        }
-        result.push(GroupData { name: group.name, components });
-    }
-    result
-}
 
 // ── HTML generation ───────────────────────────────────────────────────────────
 
@@ -101,49 +31,85 @@ ul.tests li{padding:5px 10px;border-radius:4px;font-size:.82rem;margin-bottom:3p
 "#;
 
 fn render_page(groups: &[GroupData], sel_g: &str, sel_c: &str, sel_v: &str) -> String {
-    let nav: String = groups.iter().map(|g| {
-        let links: String = g.components.iter().map(|c| {
-            let active = g.name == sel_g && c.name == sel_c;
-            format!(
-                r#"<a href="/?g={g}&c={c}"{cls}>{label}</a>"#,
-                g = enc(&g.name), c = enc(&c.name),
-                cls = if active { r#" class="active""# } else { "" },
-                label = esc(&c.name),
-            )
-        }).collect();
-        format!(r#"<div class="gl">{}</div>{}"#, esc(&g.name), links)
-    }).collect();
+    let nav: String = groups
+        .iter()
+        .map(|g| {
+            let links: String = g
+                .components
+                .iter()
+                .map(|c| {
+                    let active = g.name == sel_g && c.name == sel_c;
+                    format!(
+                        r#"<a href="/?g={g}&c={c}"{cls}>{label}</a>"#,
+                        g = enc(&g.name),
+                        c = enc(&c.name),
+                        cls = if active { r#" class="active""# } else { "" },
+                        label = esc(&c.name),
+                    )
+                })
+                .collect();
+            format!(r#"<div class="gl">{}</div>{}"#, esc(&g.name), links)
+        })
+        .collect();
 
-    let content = groups.iter()
+    let content = groups
+        .iter()
         .find(|g| g.name == sel_g)
         .and_then(|g| g.components.iter().find(|c| c.name == sel_c))
         .map(|c| {
             let active_v = if sel_v.is_empty() {
                 c.variants.first().map(|v| v.name.as_str()).unwrap_or("")
-            } else { sel_v };
+            } else {
+                sel_v
+            };
 
-            let tabs: String = c.variants.iter().map(|v| format!(
-                r#"<a class="tab{act}" href="/?g={g}&c={c}&v={v}">{label}</a>"#,
-                act = if v.name == active_v { " active" } else { "" },
-                g = enc(sel_g), c = enc(&c.name), v = enc(&v.name),
-                label = esc(&v.name),
-            )).collect();
+            let tabs: String = c
+                .variants
+                .iter()
+                .map(|v| {
+                    format!(
+                        r#"<a class="tab{act}" href="/?g={g}&c={c}&v={v}">{label}</a>"#,
+                        act = if v.name == active_v { " active" } else { "" },
+                        g = enc(sel_g),
+                        c = enc(&c.name),
+                        v = enc(&v.name),
+                        label = esc(&v.name),
+                    )
+                })
+                .collect();
 
-            let preview = c.variants.iter().find(|v| v.name == active_v)
+            let preview = c
+                .variants
+                .iter()
+                .find(|v| v.name == active_v)
                 .map(|v| format!(r#"<div class="preview">{}</div>"#, v.html))
-                .unwrap_or_else(|| if c.has_interactive {
-                    r#"<div class="preview"><span class="empty">interactive — use trunk for live editing</span></div>"#.to_string()
-                } else { String::new() });
+                .unwrap_or_else(|| {
+                    if c.has_interactive {
+                        r#"<div class="preview"><span class="empty">interactive — use trunk for live editing</span></div>"#
+                            .to_string()
+                    } else {
+                        String::new()
+                    }
+                });
 
             let tests: String = if c.tests.is_empty() {
                 r#"<span class="empty">no test cases</span>"#.to_string()
             } else {
-                c.tests.iter().map(|t| {
-                    let ms: String = t.matchers.iter()
-                        .map(|m| format!("<div>{}</div>", esc(m))).collect();
-                    format!(r#"<li><div class="tn">{}</div><div class="tm">{}</div></li>"#,
-                        esc(&t.name), ms)
-                }).collect()
+                c.tests
+                    .iter()
+                    .map(|t| {
+                        let ms: String = t
+                            .matchers
+                            .iter()
+                            .map(|m| format!("<div>{}</div>", esc(m)))
+                            .collect();
+                        format!(
+                            r#"<li><div class="tn">{}</div><div class="tm">{}</div></li>"#,
+                            esc(&t.name),
+                            ms
+                        )
+                    })
+                    .collect()
             };
 
             format!(
@@ -159,51 +125,66 @@ fn render_page(groups: &[GroupData], sel_g: &str, sel_c: &str, sel_v: &str) -> S
                 ia = if c.has_interactive { " · interactive" } else { "" },
             )
         })
-        .unwrap_or_else(|| r#"<p class="empty">Select a component from the sidebar.</p>"#.to_string());
+        .unwrap_or_else(|| {
+            r#"<p class="empty">Select a component from the sidebar.</p>"#.to_string()
+        });
 
-    format!(r#"<!DOCTYPE html><html lang="en"><head>
+    format!(
+        r#"<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>YewPreview</title><style>{CSS}</style>
 </head><body>
 <nav><h1>YewPreview</h1>{nav}</nav>
 <main>{content}</main>
-</body></html>"#)
-}
-
-fn esc(s: &str) -> String {
-    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;")
+</body></html>"#
+    )
 }
 
 fn enc(s: &str) -> String {
-    s.chars().flat_map(|c| match c {
-        'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' => vec![c],
-        ' ' => vec!['+'],
-        c => format!("%{:02X}", c as u32).chars().collect(),
-    }).collect()
+    s.chars()
+        .flat_map(|c| match c {
+            'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' => vec![c],
+            ' ' => vec!['+'],
+            c => format!("%{:02X}", c as u32).chars().collect(),
+        })
+        .collect()
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
 #[derive(Deserialize, Default)]
-struct Sel { g: Option<String>, c: Option<String>, v: Option<String> }
+struct Sel {
+    g: Option<String>,
+    c: Option<String>,
+    v: Option<String>,
+}
 
 async fn start_server(rendered: Arc<Vec<GroupData>>, port: u16) {
-    let dg = rendered.first().map(|g| g.name.clone()).unwrap_or_default();
-    let dc = rendered.first().and_then(|g| g.components.first())
-        .map(|c| c.name.clone()).unwrap_or_default();
+    let dg = rendered
+        .first()
+        .map(|g| g.name.clone())
+        .unwrap_or_default();
+    let dc = rendered
+        .first()
+        .and_then(|g| g.components.first())
+        .map(|c| c.name.clone())
+        .unwrap_or_default();
 
-    let router = Router::new().route("/", get({
-        let rendered = Arc::clone(&rendered);
-        let dg = dg.clone();
-        let dc = dc.clone();
-        move |Query(sel): Query<Sel>| {
+    let router = Router::new().route(
+        "/",
+        get({
             let rendered = Arc::clone(&rendered);
-            let g = sel.g.unwrap_or_else(|| dg.clone());
-            let c = sel.c.unwrap_or_else(|| dc.clone());
-            let v = sel.v.unwrap_or_default();
-            async move { axum::response::Html(render_page(&rendered, &g, &c, &v)) }
-        }
-    }));
+            let dg = dg.clone();
+            let dc = dc.clone();
+            move |Query(sel): Query<Sel>| {
+                let rendered = Arc::clone(&rendered);
+                let g = sel.g.unwrap_or_else(|| dg.clone());
+                let c = sel.c.unwrap_or_else(|| dc.clone());
+                let v = sel.v.unwrap_or_default();
+                async move { axum::response::Html(render_page(&rendered, &g, &c, &v)) }
+            }
+        }),
+    );
 
     let listener = match tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await {
         Ok(l) => l,

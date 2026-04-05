@@ -11,7 +11,8 @@ repository.workspace = true
 default = []
 testing = ["yew/ssr"]
 tests-ignored = []
-serve = ["dep:axum", "dep:tokio", "dep:tower-http", "dep:serde", "yew/ssr"]
+catalog = ["dep:tokio", "yew/ssr"]
+serve = ["catalog", "dep:axum", "dep:tower-http", "dep:serde"]
 
 [dependencies]
 yew = { workspace = true }

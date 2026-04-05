@@ -35,8 +35,18 @@ where
 /// Run SSR tests for every component in every group that has an `ssr_runner`.
 /// Call this from a single `#[tokio::test]` pointing at your app's groups.
 /// Run with `-- --nocapture` to see per-test-case output.
+///
+/// When the `tests-ignored` feature is active this function is a no-op, which
+/// mirrors the `#[ignore]` behaviour applied to the auto-generated test modules
+/// produced by `create_preview_with_tests!`.
 #[cfg(feature = "testing")]
 pub async fn run_groups_tests(groups: &crate::component_list::ComponentList) {
+    #[cfg(feature = "tests-ignored")]
+    {
+        let _ = groups;
+        return;
+    }
+    #[cfg(not(feature = "tests-ignored"))]
     for group in groups {
         let testable: Vec<_> = group.components.iter()
             .filter(|c| c.ssr_runner.is_some())

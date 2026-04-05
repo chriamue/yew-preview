@@ -15,3 +15,5 @@ Cargo.lock
 *.pdb
 .idea/
 .DS_Store
+
+yew-preview-example-yew-preview.html

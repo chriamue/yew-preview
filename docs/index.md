@@ -14,6 +14,8 @@ tags: [index, home]
 - [[interactive]] — Live prop editing with `ArgValue` and `InteractiveArgs`
 - [[components]] — UI components that make up the preview browser
 - [[testing]] — Built-in test utilities and matchers
+- [[serve]] — Native preview server via axum (no trunk needed)
+- [[catalog]] — Generate a static HTML catalog of all components
 - [[architecture]] — How the library is structured internally
 - [[examples]] — Annotated walkthrough of the bundled example
 

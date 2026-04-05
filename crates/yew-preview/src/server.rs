@@ -224,7 +224,7 @@ pub fn serve_blocking(groups: ComponentList, port: u16) {
     // Yew's LocalServerRenderer requires a LocalSet (uses spawn_local).
     let rendered = rt.block_on(async {
         tokio::task::LocalSet::new()
-            .run_until(prerender(groups))
+            .run_until(prerender(groups, None))
             .await
     });
 

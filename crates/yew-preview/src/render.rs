@@ -53,18 +53,34 @@ pub(crate) struct GroupData {
 
 // ── Pre-rendering ─────────────────────────────────────────────────────────────
 
+/// A function that wraps a variant's [`Html`] before SSR — use it to inject
+/// context providers (i18n, theme, repository, …) that components require.
+///
+/// Stored as an `Rc` so it can live on the `LocalSet` thread without `Send`.
+pub type RenderWrapper = std::rc::Rc<dyn Fn(Html) -> Html>;
+
 /// Consume a `ComponentList` (not `Send`), SSR-render every variant, and return
 /// plain `String` data that is `Send + Sync`.
 ///
 /// Must be called inside a `tokio::task::LocalSet` because Yew's
 /// `LocalServerRenderer` uses `spawn_local` internally.
-pub(crate) async fn prerender(groups: ComponentList) -> Vec<GroupData> {
+///
+/// If `wrapper` is `Some`, every variant node is passed through it before
+/// SSR so that context providers (i18n, theme, …) are in scope.
+pub(crate) async fn prerender(
+    groups: ComponentList,
+    wrapper: Option<&RenderWrapper>,
+) -> Vec<GroupData> {
     let mut result = Vec::new();
     for group in groups {
         let mut components = Vec::new();
         for item in group.components {
             let mut variants = Vec::new();
             for (name, node) in item.render {
+                let node = match wrapper {
+                    Some(w) => w(node),
+                    None => node,
+                };
                 variants.push(VariantData {
                     name,
                     html: ssr(node).await,

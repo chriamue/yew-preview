@@ -17,7 +17,7 @@
 //! ```
 
 use crate::component_list::ComponentList;
-use crate::render::{esc, prerender, ComponentData, GroupData, VariantData};
+use crate::render::{esc, prerender, ComponentData, GroupData, RenderWrapper, VariantData};
 use std::path::PathBuf;
 
 // ── Built-in catalog structure styles ─────────────────────────────────────────
@@ -518,7 +518,7 @@ fn generate_html(groups: &[GroupData], title: &str, extra_css: Option<&str>) -> 
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /// Configuration for [`generate_catalog_blocking`].
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct CatalogOptions {
     /// Project / crate name — used as the page title and as the default output
     /// filename (`{project_name}-yew-preview.html`).
@@ -530,6 +530,12 @@ pub struct CatalogOptions {
     /// Where to write the HTML file.
     /// Defaults to `{project_name}-yew-preview.html` in the current directory.
     pub output: Option<PathBuf>,
+    /// Optional function that wraps every component variant's [`Html`] before
+    /// SSR. Use this to inject context providers (i18n, theme, repository, …)
+    /// that your components require at render time.
+    ///
+    /// [`Html`]: yew::Html
+    pub wrapper: Option<RenderWrapper>,
 }
 
 impl CatalogOptions {
@@ -539,6 +545,7 @@ impl CatalogOptions {
             project_name: project_name.into(),
             css_file: None,
             output: None,
+            wrapper: None,
         }
     }
 
@@ -551,6 +558,25 @@ impl CatalogOptions {
     /// Write the catalog to `path` instead of the default filename.
     pub fn output(mut self, path: impl Into<PathBuf>) -> Self {
         self.output = Some(path.into());
+        self
+    }
+
+    /// Wrap every variant in a provider tree before SSR.
+    ///
+    /// The closure receives the variant's `Html` and must return a new `Html`
+    /// with any required context providers wrapped around it:
+    ///
+    /// ```rust,ignore
+    /// options = options.wrapper(|node| html! {
+    ///     <I18nProvider config={create_i18n_config()}>
+    ///         <ThemeProvider>
+    ///             {node}
+    ///         </ThemeProvider>
+    ///     </I18nProvider>
+    /// });
+    /// ```
+    pub fn wrapper(mut self, f: impl Fn(yew::Html) -> yew::Html + 'static) -> Self {
+        self.wrapper = Some(std::rc::Rc::new(f));
         self
     }
 }
@@ -574,9 +600,10 @@ pub fn generate_catalog_blocking(groups: ComponentList, options: CatalogOptions)
         .expect("failed to build tokio runtime");
 
     // Yew's LocalServerRenderer requires a LocalSet (uses spawn_local).
+    let wrapper = options.wrapper;
     let rendered = rt.block_on(async {
         tokio::task::LocalSet::new()
-            .run_until(prerender(groups))
+            .run_until(prerender(groups, wrapper.as_ref()))
             .await
     });
 

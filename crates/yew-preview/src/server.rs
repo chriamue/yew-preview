@@ -207,7 +207,7 @@ async fn start_server(rendered: Arc<Vec<GroupData>>, port: u16) {
 ///
 /// Call this from a native `main` (not WASM). Add to your project:
 ///
-/// ```rust
+/// ```rust,ignore
 /// // examples/serve.rs
 /// fn main() {
 ///     yew_preview::serve_blocking(my_app::preview_groups(), 8080);

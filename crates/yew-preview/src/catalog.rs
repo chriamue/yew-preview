@@ -5,7 +5,7 @@
 //!
 //! # Example
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! // examples/catalog.rs
 //! fn main() {
 //!     yew_preview::generate_catalog_blocking(
